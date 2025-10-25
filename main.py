@@ -1,8 +1,4 @@
-from pico2d import *
-
-
-class Map:
-    pass
+from map import Map
 
 
 def reset_world():
