@@ -1,5 +1,18 @@
 
-def reset_world():
-    global world
+def init():
+    pass
 
-    world = []
+def update():
+    pass
+
+def draw():
+    pass
+
+def finish():
+    pass
+
+def pause():
+    pass
+
+def resume():
+    pass
