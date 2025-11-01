@@ -14,10 +14,11 @@ def handle_events():
             if event.key == SDLK_ESCAPE:
                 game_framework.quit()
 def init():
-    pass
+    map = Map()
+    game_world.add_object(map, 0)
 
 def update():
-    pass
+    game_world.update()
 
 def draw():
     pass
