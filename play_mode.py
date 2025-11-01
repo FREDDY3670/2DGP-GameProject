@@ -1,3 +1,6 @@
+from pico2d import *
+from map import Map
+import game_framework
 
 select_map = 0
 def init():
