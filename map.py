@@ -6,3 +6,6 @@ class Map:
         self.tile_image = load_image('tile_map1.png')
     def draw(self):
         pass
+
+    def update(self):
+        pass
