@@ -26,7 +26,7 @@ def draw():
     update_canvas()
 
 def finish():
-    pass
+    game_world.clear()
 
 def pause():
     pass
