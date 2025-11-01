@@ -21,7 +21,9 @@ def update():
     game_world.update()
 
 def draw():
-    pass
+    clear_canvas()
+    game_world.render()
+    update_canvas()
 
 def finish():
     pass
