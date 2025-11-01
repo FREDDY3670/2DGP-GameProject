@@ -1,4 +1,5 @@
 
+select_map = 0
 def init():
     pass
 
