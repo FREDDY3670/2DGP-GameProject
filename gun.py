@@ -22,7 +22,7 @@ class Idle:
     def do(self):
         pass
     def draw(self):
-        self.gun.image_idle.draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
+        self.gun.image_idle.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
                                               200)
 
 class Run:
