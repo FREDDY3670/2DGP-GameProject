@@ -32,3 +32,7 @@ class Gun:
             Gun.image_ia = load_image('GunFire.png')
         if Gun.image_ra == None:
             Gun.image_ra = load_image('GunRunFire01-sheet.png')
+
+        self.x, self.y = 100, 180
+        self.frame = 0
+        self.face_dir = 1
