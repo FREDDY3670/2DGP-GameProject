@@ -41,3 +41,13 @@ class Sword:
                 self.RUN: {}
             }
         )
+
+    def update(self):
+        self.state_machine.update()
+
+    def handle_event(self, event):
+        self.state_machine.handle_state_event(('INPUT', event))
+        pass
+
+    def draw(self):
+        self.state_machine.draw()
