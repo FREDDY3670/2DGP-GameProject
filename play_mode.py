@@ -3,6 +3,7 @@ from map import Map
 import game_framework
 import game_world
 from gun import Gun
+from tile import Tile
 
 select_map = 0
 
@@ -24,6 +25,8 @@ def init():
     map = Map()
     game_world.add_object(map, 0)
 
+    tile = Tile()
+    game_world.add_object(tile, 0)
     gun = Gun()
     game_world.add_object(gun, 1)
 
