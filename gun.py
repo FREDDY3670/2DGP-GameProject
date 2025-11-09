@@ -44,9 +44,12 @@ class Idle:
 
 class Run:
     def __init__(self,Gun):
-        pass
+        self.gun = Gun
     def enter(self,e):
-        pass
+        if left_down(e):
+            self.gun.face_dir = -1
+        elif right_down(e):
+            self.gun.face_dir = 1
     def exit(self,e):
         pass
     def do(self):
