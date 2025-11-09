@@ -5,7 +5,7 @@ class Map:
         self.bg_image = load_image('Gray-BG.png')
         self.tile_image = load_image('tile_map1.png')
     def draw(self):
-        self.bg_image.draw(400,300)
+        self.bg_image.draw(800,450)
 
     def update(self):
         pass
