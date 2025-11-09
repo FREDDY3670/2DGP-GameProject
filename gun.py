@@ -1,10 +1,12 @@
 from pico2d import load_image
 
 class Idle:
-    pass
+    def __init__(self,Gun):
+        pass
 
 class Run:
-    pass
+    def __init__(self,Gun):
+        pass
 
 class Gun:
     def __init__(self):
