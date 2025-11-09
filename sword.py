@@ -44,7 +44,11 @@ class Idle:
         self.row = 0
 
     def enter(self, e):
-        pass
+        if space_down(e):
+            self.atk = True
+            self.atk_count += 1
+            self.combo_timer = 0
+            self.Sword.frame = 0
 
     def exit(self, e):
         pass
