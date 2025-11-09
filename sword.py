@@ -54,7 +54,29 @@ class Idle:
         pass
 
     def do(self):
+        if self.atk:
+            if self.atk_frame == 0:
+                self.row = (self.atk_count - 1) % 4
+                if self.row == 0:
+                    self.atk_frame = 6
+                elif self.row == 1 or self.row == 2:
+                    self.atk_frame = 5
+                elif self.row == 3:
+                    self.atk_frame = 6
             self.Sword.frame = (self.Sword.frame + 7 * ACTION_PER_TIME * game_framework.frame_time)
+            if self.Sword.frame >= self.atk_frame:
+                self.atk = False
+                self.atk_frame = 0
+                self.combo_timer = 0
+                self.Sword.frame = 0
+        else:
+            self.Sword.frame = (self.Sword.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 7
+            if self.atk_count > 0:
+                self.combo_timer += game_framework.frame_time
+                if self.combo_timer >= self.COMBO_TIME_LIMIT:
+                    self.atk_count = 0
+                    self.combo_timer = 0
+                    self.Sword.frame = 0
 
     def draw(self):
         if self.atk == False:
@@ -64,7 +86,13 @@ class Idle:
             else:
                 self.Sword.image_idle.clip_composite_draw(int(self.Sword.frame) * 96, 0, 96, 84, 0, 'h', self.Sword.x,
                                                           self.Sword.y, 200, 200)
-
+        else:
+            if self.Sword.face_dir == 1:
+                self.Sword.image_ia.clip_draw(int(self.Sword.frame) * 96, self.row * 84, 96, 84, self.Sword.x,
+                                              self.Sword.y, 200, 200)
+            else:
+                self.Sword.image_ia.clip_composite_draw(int(self.Sword.frame) * 96, self.row * 84, 96, 84, 0, 'h',
+                                                        self.Sword.x, self.Sword.y, 200, 200)
 
 
 class Sword:
