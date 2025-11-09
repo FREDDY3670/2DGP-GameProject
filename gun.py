@@ -53,7 +53,8 @@ class Run:
     def exit(self,e):
         pass
     def do(self):
-        pass
+        self.gun.frame = (self.gun.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        self.gun.x += self.gun.face_dir * RUN_SPEED_PPS * game_framework.frame_time
     def draw(self):
         if self.gun.face_dir == 1:
             self.gun.image_run.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
