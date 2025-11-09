@@ -32,6 +32,7 @@ FRAMES_PER_ACTION = 8
 class Idle:
     def __init__(self,Gun):
         self.gun = Gun
+        self.atk = False
     def enter(self,e):
         self.gun.frame = 0
         if left_up(e):
@@ -53,6 +54,7 @@ class Idle:
 class Run:
     def __init__(self,Gun):
         self.gun = Gun
+        self.atk = False
     def enter(self,e):
         if left_down(e):
             self.gun.face_dir = -1
