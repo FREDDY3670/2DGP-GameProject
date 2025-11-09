@@ -55,6 +55,7 @@ class Run:
     def __init__(self,Gun):
         self.gun = Gun
         self.atk = False
+        self.atk_frame = 8
     def enter(self,e):
         if left_down(e):
             self.gun.face_dir = -1
@@ -64,9 +65,16 @@ class Run:
             self.atk = True
             self.gun.frame = 0
     def exit(self,e):
-        pass
+        self.atk = False
     def do(self):
-        self.gun.frame = (self.gun.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        if self.atk == True:
+            self.gun.frame = (self.gun.frame + 7 * ACTION_PER_TIME * game_framework.frame_time)
+            if self.gun.frame >= self.atk_frame:  # ← 이제 8 이상이 될 수 있음
+                self.atk = False
+                self.gun.frame = 0
+        else:
+            self.gun.frame = (self.gun.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+
         self.gun.x += self.gun.face_dir * RUN_SPEED_PPS * game_framework.frame_time
     def draw(self):
         if self.atk == False:
