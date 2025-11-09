@@ -15,9 +15,25 @@ FRAMES_PER_ACTION = 8
 class Idle:
     def __init__(self,Gun):
         pass
+    def enter(self,e):
+        pass
+    def exit(self,e):
+        pass
+    def do(self):
+        pass
+    def draw(self):
+        pass
 
 class Run:
     def __init__(self,Gun):
+        pass
+    def enter(self,e):
+        pass
+    def exit(self,e):
+        pass
+    def do(self):
+        pass
+    def draw(self):
         pass
 
 class Gun:
