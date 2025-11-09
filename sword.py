@@ -24,3 +24,7 @@ class Sword:
             Sword.image_ia = load_image('swordcombo.png')
         if Sword.image_ra == None:
             Sword.image_ra = load_image('SwordRunSlash01_right.png')
+
+        self.x, self.y = 100, 180
+        self.frame = 0
+        self.face_dir = 1
