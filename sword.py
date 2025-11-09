@@ -54,10 +54,18 @@ class Idle:
         pass
 
     def do(self):
-        pass
+            self.Sword.frame = (self.Sword.frame + 7 * ACTION_PER_TIME * game_framework.frame_time)
 
     def draw(self):
-        pass
+        if self.atk == False:
+            if self.Sword.face_dir == 1:  # right
+                self.Sword.image_idle.clip_draw(int(self.Sword.frame) * 96, 0, 96, 84, self.Sword.x, self.Sword.y, 200,
+                                                200)
+            else:
+                self.Sword.image_idle.clip_composite_draw(int(self.Sword.frame) * 96, 0, 96, 84, 0, 'h', self.Sword.x,
+                                                          self.Sword.y, 200, 200)
+
+
 
 class Sword:
     image_idle = None
