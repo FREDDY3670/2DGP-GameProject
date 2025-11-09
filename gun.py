@@ -14,7 +14,7 @@ FRAMES_PER_ACTION = 8
 
 class Idle:
     def __init__(self,Gun):
-        pass
+        self.gun = Gun
     def enter(self,e):
         pass
     def exit(self,e):
@@ -22,7 +22,8 @@ class Idle:
     def do(self):
         pass
     def draw(self):
-        pass
+        self.gun.image_idle.draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
+                                              200)
 
 class Run:
     def __init__(self,Gun):
@@ -37,11 +38,11 @@ class Run:
         pass
 
 class Gun:
+    image_idle = None
+    image_run = None
+    image_ia = None
+    image_ra = None
     def __init__(self):
-        image_idle = None
-        image_run = None
-        image_ia = None
-        image_ra = None
         if Gun.image_idle == None:
             Gun.image_idle = load_image('GunAim.png')
         if Gun.image_run == None:
