@@ -1,5 +1,7 @@
 from pico2d import load_image
 
+from state_machine import StateMachine
+
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
 RUN_SPEED_KMPH = 40.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
@@ -36,6 +38,17 @@ class Gun:
         self.x, self.y = 100, 180
         self.frame = 0
         self.face_dir = 1
+
+        self.IDLE = Idle(self)
+        self.RUN = Run(self)
+
+        self.state_machine = StateMachine(
+            self.IDLE,
+            {
+                self.IDLE: {},
+                self.RUN: {}
+            }
+        )
 
     def update(self):
         self.state_machine.update()
