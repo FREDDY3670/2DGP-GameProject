@@ -33,23 +33,38 @@ class Idle:
     def __init__(self,Gun):
         self.gun = Gun
         self.atk = False
+        self.atk_frame = 5
     def enter(self,e):
         self.gun.frame = 0
         if left_up(e):
             self.gun.face_dir = -1
         elif right_up(e):
             self.gun.face_dir = 1
+        elif space_down(e):
+            self.atk = True
     def exit(self,e):
-        pass
+        self.atk = False
     def do(self):
-        pass
+        if self.atk == True:
+            self.gun.frame = (self.gun.frame + 7 * ACTION_PER_TIME * game_framework.frame_time)
+            if self.gun.frame >= self.atk_frame:  # ← 이제 8 이상이 될 수 있음
+                self.atk = False
+                self.gun.frame = 0
     def draw(self):
-        if self.gun.face_dir == 1:
-            self.gun.image_idle.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
-                                              200)
+        if self.atk == False:
+            if self.gun.face_dir == 1:
+                self.gun.image_idle.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
+                                                  200)
+            else:
+                self.gun.image_idle.clip_composite_draw(int(self.gun.frame) * 96, 0, 96, 84,0,'h', self.gun.x, self.gun.y, 200,
+                                                  200)
         else:
-            self.gun.image_idle.clip_composite_draw(int(self.gun.frame) * 96, 0, 96, 84,0,'h', self.gun.x, self.gun.y, 200,
-                                              200)
+            if self.gun.face_dir == 1:
+                self.gun.image_ia.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
+                                                200)
+            else:
+                self.gun.image_ia.clip_composite_draw(int(self.gun.frame) * 96, 0, 96, 84,0,'h', self.gun.x, self.gun.y, 200,
+                                                  200)
 
 class Run:
     def __init__(self,Gun):
