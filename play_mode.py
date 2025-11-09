@@ -18,12 +18,18 @@ def handle_events():
                 for o in layer:
                     if hasattr(o, 'handle_event'):
                         o.handle_event(event)
+
+
+class Gun:
+    pass
+
+
 def init():
     map = Map()
     game_world.add_object(map, 0)
 
-    sword = Sword()
-    game_world.add_object(sword, 1)
+    gun = Gun()
+    game_world.add_object(gun, 1)
 
 def update():
     game_world.update()
