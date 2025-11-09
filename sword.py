@@ -35,7 +35,13 @@ class Run:
 
 class Idle:
     def __init__(self,Sword):
-        pass
+        self.Sword = Sword
+        self.atk = False
+        self.atk_count = 0
+        self.combo_timer = 0  
+        self.COMBO_TIME_LIMIT = 0.7
+        self.atk_frame = 0
+        self.row = 0
 
 class Sword:
     image_idle = None
