@@ -3,6 +3,7 @@ from sdl2 import SDL_KEYDOWN, SDLK_LEFT, SDLK_RIGHT, SDL_KEYUP, SDLK_SPACE
 
 import game_framework
 from state_machine import StateMachine
+import game_world
 
 def space_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
@@ -29,6 +30,22 @@ TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
 
+
+class Bullet:
+    def __init__(self, x, y, direction):
+        self.x, self.y = x , y-25
+        self.direction = direction
+        self.speed = 750
+
+    def update(self):
+        self.x += self.direction * self.speed * game_framework.frame_time
+        # 화면 밖으로 나가면 제거
+        if self.x < 0 or self.x > 1600:
+            game_world.remove_object(self)
+
+    def draw(self):
+        Gun.bullet_image.draw(self.x, self.y,150,150)
+
 class Idle:
     def __init__(self,Gun):
         self.gun = Gun
@@ -42,6 +59,7 @@ class Idle:
             self.gun.face_dir = 1
         elif space_down(e):
             self.atk = True
+            self.gun.shoot()
     def exit(self,e):
         self.atk = False
     def do(self):
@@ -79,6 +97,7 @@ class Run:
         elif space_down(e):
             self.atk = True
             self.gun.frame = 0
+            self.gun.shoot()
     def exit(self,e):
         self.atk = False
     def do(self):
@@ -149,3 +168,7 @@ class Gun:
 
     def draw(self):
         self.state_machine.draw()
+
+    def shoot(self):
+        bullet = Bullet(self.x, self.y, self.face_dir)
+        game_world.add_object(bullet,1)
