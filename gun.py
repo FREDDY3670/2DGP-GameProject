@@ -33,13 +33,21 @@ class Idle:
     def __init__(self,Gun):
         self.gun = Gun
     def enter(self,e):
-        pass
+        self.gun.frame = 0
+        if left_up(e):
+            self.gun.face_dir = -1
+        elif right_up(e):
+            self.gun.face_dir = 1
     def exit(self,e):
         pass
     def do(self):
         pass
     def draw(self):
-        self.gun.image_idle.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
+        if self.gun.face_dir == 1:
+            self.gun.image_idle.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
+                                              200)
+        else:
+            self.gun.image_idle.clip_composite_draw(int(self.gun.frame) * 96, 0, 96, 84,0,'h', self.gun.x, self.gun.y, 200,
                                               200)
 
 class Run:
