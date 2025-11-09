@@ -89,7 +89,7 @@ class Gun:
             self.IDLE,
             {
                 self.IDLE: {left_down : self.RUN, right_down : self.RUN},
-                self.RUN: {}
+                self.RUN: {left_up : self.IDLE, right_up : self.IDLE, right_down : self.IDLE, left_down : self.IDLE}
             }
         )
 
