@@ -55,7 +55,12 @@ class Run:
     def do(self):
         pass
     def draw(self):
-        pass
+        if self.gun.face_dir == 1:
+            self.gun.image_run.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
+                                              200)
+        else:
+            self.gun.image_run.clip_composite_draw(int(self.gun.frame) * 96, 0, 96, 84,0,'h', self.gun.x, self.gun.y, 200,
+                                              200)
 
 class Gun:
     image_idle = None
