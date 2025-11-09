@@ -30,8 +30,49 @@ ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
 
 class Run:
-    def __init__(self,Sword):
-        pass
+    def __init__(self, Sword):
+        self.Sword = Sword
+        self.atk = False
+        self.atk_frame = 8
+
+    def enter(self, e):
+        if right_down(e):
+            self.Sword.face_dir = 1
+        elif left_down(e):
+            self.Sword.face_dir = -1
+        elif space_down(e):
+            self.atk = True
+            self.Sword.frame = 0
+
+    def exit(self, e):
+        self.atk = False
+
+    def do(self):
+
+        if self.atk == True:
+            self.Sword.frame = (self.Sword.frame + 7 * ACTION_PER_TIME * game_framework.frame_time)
+            if self.Sword.frame >= self.atk_frame:
+                self.atk = False  # 공격 종료
+                self.Sword.frame = 0
+        else:
+            self.Sword.frame = (self.Sword.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        self.Sword.x += self.Sword.face_dir * RUN_SPEED_PPS * game_framework.frame_time
+
+    def draw(self):
+        if self.atk == False:
+            if self.Sword.face_dir == 1:  # right
+                self.Sword.image_run.clip_draw(int(self.Sword.frame) * 96, 0, 96, 84, self.Sword.x, self.Sword.y, 200,
+                                               200)
+            else:
+                self.Sword.image_run.clip_composite_draw(int(self.Sword.frame) * 96, 0, 96, 84, 0, 'h', self.Sword.x,
+                                                         self.Sword.y, 200, 200)
+        else:
+            if self.Sword.face_dir == 1:  # right
+                self.Sword.image_ra.clip_draw(int(self.Sword.frame) * 96, 0, 96, 84, self.Sword.x, self.Sword.y, 200,
+                                              200)
+            else:
+                self.Sword.image_ra.clip_composite_draw(int(self.Sword.frame) * 96, 0, 96, 84, 0, 'h', self.Sword.x,
+                                                        self.Sword.y, 200, 200)
 
 class Idle:
     def __init__(self,Sword):
