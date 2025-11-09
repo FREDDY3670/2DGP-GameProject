@@ -112,6 +112,7 @@ class Gun:
     image_run = None
     image_ia = None
     image_ra = None
+    bullet_image = None
     def __init__(self):
         if Gun.image_idle == None:
             Gun.image_idle = load_image('GunAim.png')
@@ -121,6 +122,8 @@ class Gun:
             Gun.image_ia = load_image('GunFire.png')
         if Gun.image_ra == None:
             Gun.image_ra = load_image('GunRunFire01-sheet.png')
+        if Gun.bullet_image == None:
+            Gun.bullet_image = load_image('Bullet02.png')
 
         self.x, self.y = 100, 180
         self.frame = 0
