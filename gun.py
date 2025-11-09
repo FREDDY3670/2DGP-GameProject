@@ -69,12 +69,20 @@ class Run:
         self.gun.frame = (self.gun.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
         self.gun.x += self.gun.face_dir * RUN_SPEED_PPS * game_framework.frame_time
     def draw(self):
-        if self.gun.face_dir == 1:
-            self.gun.image_run.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
-                                              200)
+        if self.atk == False:
+            if self.gun.face_dir == 1:
+                self.gun.image_run.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
+                                                  200)
+            else:
+                self.gun.image_run.clip_composite_draw(int(self.gun.frame) * 96, 0, 96, 84,0,'h', self.gun.x, self.gun.y, 200,
+                                                  200)
         else:
-            self.gun.image_run.clip_composite_draw(int(self.gun.frame) * 96, 0, 96, 84,0,'h', self.gun.x, self.gun.y, 200,
-                                              200)
+            if self.gun.face_dir == 1:
+                self.gun.image_ra.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
+                                                200)
+            else:
+                self.gun.image_ra.clip_composite_draw(int(self.gun.frame) * 96, 0, 96, 84,0,'h', self.gun.x, self.gun.y, 200,
+                                                  200)
 
 class Gun:
     image_idle = None
