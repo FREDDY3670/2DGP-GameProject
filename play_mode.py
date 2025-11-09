@@ -2,6 +2,7 @@ from pico2d import *
 from map import Map
 import game_framework
 import game_world
+from sword import Sword
 
 select_map = 0
 
@@ -16,6 +17,9 @@ def handle_events():
 def init():
     map = Map()
     game_world.add_object(map, 0)
+
+    sword = Sword()
+    game_world.add_object(sword, 1)
 
 def update():
     game_world.update()
