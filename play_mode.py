@@ -14,6 +14,11 @@ def handle_events():
         elif event.type == SDL_KEYDOWN:
             if event.key == SDLK_ESCAPE:
                 game_framework.quit()
+        else:
+            for layer in game_world.world:
+                for o in layer:
+                    if hasattr(o, 'handle_event'):
+                        o.handle_event(event)
 def init():
     map = Map()
     game_world.add_object(map, 0)
