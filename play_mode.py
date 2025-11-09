@@ -2,7 +2,7 @@ from pico2d import *
 from map import Map
 import game_framework
 import game_world
-from sword import Sword
+from gun import Gun
 
 select_map = 0
 
@@ -18,10 +18,6 @@ def handle_events():
                 for o in layer:
                     if hasattr(o, 'handle_event'):
                         o.handle_event(event)
-
-
-class Gun:
-    pass
 
 
 def init():
