@@ -4,10 +4,12 @@ import game_framework
 from state_machine import StateMachine
 
 class Run:
-    pass
+    def __init__(self,Sword):
+        pass
 
 class Idle:
-    pass
+    def __init__(self,Sword):
+        pass
 
 class Sword:
     image_idle = None
@@ -28,3 +30,14 @@ class Sword:
         self.x, self.y = 100, 180
         self.frame = 0
         self.face_dir = 1
+
+        self.IDLE = Idle(self)
+        self.RUN = Run(self)
+
+        self.state_machine = StateMachine(
+            self.IDLE,
+            {
+                self.IDLE: {},
+                self.RUN: {}
+            }
+        )
