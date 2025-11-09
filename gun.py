@@ -96,8 +96,8 @@ class Gun:
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: {left_down : self.RUN, right_down : self.RUN},
-                self.RUN: {left_up : self.IDLE, right_up : self.IDLE, right_down : self.IDLE, left_down : self.IDLE}
+                self.IDLE: {left_down : self.RUN, right_down : self.RUN,space_down : self.IDLE},
+                self.RUN: {space_down : self.RUN, left_up : self.IDLE, right_up : self.IDLE, right_down : self.IDLE, left_down : self.IDLE}
             }
         )
 
