@@ -162,7 +162,7 @@ class Sword:
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: {space_down : self.IDLE},
+                self.IDLE: {left_down : self.RUN, right_down : self.RUN,space_down : self.IDLE},
                 self.RUN: {}
             }
         )
