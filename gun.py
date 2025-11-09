@@ -60,6 +60,9 @@ class Run:
             self.gun.face_dir = -1
         elif right_down(e):
             self.gun.face_dir = 1
+        elif space_down(e):
+            self.atk = True
+            self.gun.frame = 0
     def exit(self,e):
         pass
     def do(self):
