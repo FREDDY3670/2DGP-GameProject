@@ -36,3 +36,13 @@ class Gun:
         self.x, self.y = 100, 180
         self.frame = 0
         self.face_dir = 1
+
+    def update(self):
+        self.state_machine.update()
+
+    def handle_event(self, event):
+        self.state_machine.handle_state_event(('INPUT', event))
+        pass
+
+    def draw(self):
+        self.state_machine.draw()
