@@ -44,7 +44,7 @@ class Bullet:
             game_world.remove_object(self)
 
     def draw(self):
-        Gun.bullet_image.draw(self.x, self.y,150,150)
+        Gun.bullet_image.draw(self.x, self.y,200,200)
 
 class Idle:
     def __init__(self,Gun):
