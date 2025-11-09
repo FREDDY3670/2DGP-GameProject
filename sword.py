@@ -38,10 +38,22 @@ class Idle:
         self.Sword = Sword
         self.atk = False
         self.atk_count = 0
-        self.combo_timer = 0  
+        self.combo_timer = 0
         self.COMBO_TIME_LIMIT = 0.7
         self.atk_frame = 0
         self.row = 0
+
+    def enter(self, e):
+        pass
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        pass
+
+    def draw(self):
+        pass
 
 class Sword:
     image_idle = None
