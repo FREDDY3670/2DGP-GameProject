@@ -3,8 +3,8 @@ from pico2d import *
 import game_framework
 import play_mode
 
-player1_weapon = 0
-player2_weapon = 0
+player1_weapon = None
+player2_weapon = None
 frame_1 = 0
 frame_2 = 0
 frame_3 = 0
@@ -60,12 +60,45 @@ def draw():
     update_canvas()
 
 def handle_events():
+    global select
     event_list = get_events()
     for event in event_list:
         if event.type == SDL_QUIT:
             game_framework.quit()
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            game_framework.quit()
+        elif event.type == SDL_KEYDOWN:
+            if event.key == SDLK_ESCAPE:
+                game_framework.quit()
+            elif event.key == SDLK_1:
+                select = 1
+            elif event.key == SDLK_2:
+                select = 2
+            elif event.key == SDLK_3:
+                select = 3
+            elif event.key == SDLK_4:
+                select = 4
+            elif event.key == SDLK_RETURN:
+                if player1_weapon == None:
+                    if select == 1:
+                        player1_weapon = 'Punch'
+                    elif select == 2:
+                        player1_weapon = 'Sword'
+                    elif select == 3:
+                        player1_weapon = 'Bow'
+                    elif select == 4:
+                        player1_weapon = 'Gun'
+                elif player2_weapon == None:
+                    if select == 1:
+                        player2_weapon = 'Punch'
+                    elif select == 2:
+                        player2_weapon = 'Sword'
+                    elif select == 3:
+                        player2_weapon = 'Bow'
+                    elif select == 4:
+                        player2_weapon = 'Gun'
+                else :
+                    game_framework.change_mode(play_mode)
+
+
 
 def pause():
     pass
