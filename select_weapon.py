@@ -34,13 +34,21 @@ def init():
 
 def update():
     global frame_1, frame_2, frame_3, frame_4
+    if player1_weapon != None and player2_weapon != None:
+        game_framework.change_mode(play_mode)
+        return
     frame_1 = (frame_1 + 6 * ACTION_PER_TIME * game_framework.frame_time) % 6
     frame_2 = (frame_2 + 6 * ACTION_PER_TIME * game_framework.frame_time) % 6
     frame_3 = (frame_3 + 5 * ACTION_PER_TIME * game_framework.frame_time) % 5
     frame_4 = (frame_4 + 5 * ACTION_PER_TIME * game_framework.frame_time) % 5
 
 def finish():
-    pass
+    global image_p, image_s, image_b, image_g, bg
+    del image_p
+    del image_s
+    del image_b
+    del image_g
+    del bg
 
 def draw():
     clear_canvas()
@@ -90,6 +98,7 @@ def handle_events():
                         player1_weapon = 'Bow'
                     elif select == 3:
                         player1_weapon = 'Gun'
+                    select = 0
                 elif player2_weapon == None:
                     if select == 0:
                         player2_weapon = 'Punch'
@@ -99,8 +108,7 @@ def handle_events():
                         player2_weapon = 'Bow'
                     elif select == 3:
                         player2_weapon = 'Gun'
-                else :
-                    game_framework.change_mode(play_mode)
+                    select = 0
 
 
 
