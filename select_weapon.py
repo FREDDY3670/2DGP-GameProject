@@ -45,13 +45,13 @@ def finish():
 def draw():
     clear_canvas()
     bg.draw(800,450)
-    if select == 1:
+    if select == 0:
         draw_rectangle(100,250,300,550,255,0,0)
-    elif select == 2:
+    elif select == 1:
         draw_rectangle(500,250,700,550,255,0,0)
-    elif select == 3:
+    elif select == 2:
         draw_rectangle(900,250,1100,550,255,0,0)
-    elif select == 4:
+    elif select == 3:
         draw_rectangle(1300,250,1500,550,255,0,0)
     image_p.clip_draw(int(frame_1) * 96, 0, 96, 84, 200, 400, 150, 150)
     image_s.clip_draw(int(frame_2) * 96, 0, 96, 84, 600, 400, 150, 150)
@@ -60,7 +60,7 @@ def draw():
     update_canvas()
 
 def handle_events():
-    global select
+    global select, player1_weapon, player2_weapon
     event_list = get_events()
     for event in event_list:
         if event.type == SDL_QUIT:
@@ -69,31 +69,35 @@ def handle_events():
             if event.key == SDLK_ESCAPE:
                 game_framework.quit()
             elif event.key == SDLK_1:
-                select = 1
+                select = 0
             elif event.key == SDLK_2:
-                select = 2
+                select = 1
             elif event.key == SDLK_3:
-                select = 3
+                select = 2
             elif event.key == SDLK_4:
-                select = 4
+                select = 3
+            elif event.key == SDLK_LEFT:
+                select = (select - 1) % 4
+            elif event.key == SDLK_RIGHT:
+                select = (select + 1) % 4
             elif event.key == SDLK_RETURN:
                 if player1_weapon == None:
-                    if select == 1:
+                    if select == 0:
                         player1_weapon = 'Punch'
-                    elif select == 2:
+                    elif select == 1:
                         player1_weapon = 'Sword'
-                    elif select == 3:
+                    elif select == 2:
                         player1_weapon = 'Bow'
-                    elif select == 4:
+                    elif select == 3:
                         player1_weapon = 'Gun'
                 elif player2_weapon == None:
-                    if select == 1:
+                    if select == 0:
                         player2_weapon = 'Punch'
-                    elif select == 2:
+                    elif select == 1:
                         player2_weapon = 'Sword'
-                    elif select == 3:
+                    elif select == 2:
                         player2_weapon = 'Bow'
-                    elif select == 4:
+                    elif select == 3:
                         player2_weapon = 'Gun'
                 else :
                     game_framework.change_mode(play_mode)
