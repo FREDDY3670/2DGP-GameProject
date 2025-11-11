@@ -3,6 +3,7 @@ from map import Map
 import game_framework
 import game_world
 from gun import Gun
+from sword import Sword
 from tile import Tile
 import select_weapon
 
@@ -28,8 +29,25 @@ def init():
 
     tile = Tile()
     game_world.add_object(tile, 0)
-    gun = Gun()
-    game_world.add_object(gun, 1)
+    if select_weapon.player1_weapon == 'Gun':
+        player1 = Gun(player_id=1, start_x=200, start_y=180)
+    elif select_weapon.player1_weapon == 'Sword':
+        player1 = Sword(player_id=1, start_x=200, start_y=180)
+    # elif select_weapon.player1_weapon == 'Bow':
+    #     player1 = Bow(player_id=1, start_x=200, start_y=180)
+    # elif select_weapon.player1_weapon == 'Punch':
+    #     player1 = Punch(player_id=1, start_x=200, start_y=180)
+    game_world.add_object(player1, 1)
+
+    if select_weapon.player2_weapon == 'Gun':
+        player2 = Gun(player_id=2, start_x=1400, start_y=180)
+    elif select_weapon.player2_weapon == 'Sword':
+        player2 = Sword(player_id=2, start_x=1400, start_y=180)
+    # elif select_weapon.player2_weapon == 'Bow':
+    #     player2 = Bow(player_id=2, start_x=1400, start_y=180)
+    # elif select_weapon.player2_weapon == 'Punch':
+    #     player2 = Punch(player_id=2, start_x=1400, start_y=180)
+    game_world.add_object(player2, 1)
 
 def update():
     game_world.update()
