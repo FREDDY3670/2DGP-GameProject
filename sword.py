@@ -142,7 +142,7 @@ class Sword:
     image_ia = None
     image_ra = None
 
-    def __init__(self):
+    def __init__(self, player_id = 1, start_x = 100, start_y = 180):
         if Sword.image_idle == None:
             Sword.image_idle = load_image('SwordIdle01-sheet.png')
         if Sword.image_run == None:
@@ -152,9 +152,10 @@ class Sword:
         if Sword.image_ra == None:
             Sword.image_ra = load_image('SwordRunSlash01_right.png')
 
-        self.x, self.y = 100, 180
+        player_id = player_id
+        self.x, self.y = start_x, start_y
         self.frame = 0
-        self.face_dir = 1
+        self.face_dir = 1 if player_id == 1 else -1
 
         self.IDLE = Idle(self)
         self.RUN = Run(self)
