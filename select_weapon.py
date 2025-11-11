@@ -5,6 +5,13 @@ import play_mode
 
 player1_weapon = 0
 player2_weapon = 0
+frame_1 = 0
+frame_2 = 0
+frame_3 = 0
+frame_4 = 0
+
+TIME_PER_ACTION = 0.5
+ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 
 def init():
     image_p = None
