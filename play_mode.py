@@ -4,6 +4,7 @@ import game_framework
 import game_world
 from gun import Gun
 from tile import Tile
+import select_weapon
 
 select_map = 0
 
