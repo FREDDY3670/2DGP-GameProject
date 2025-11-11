@@ -10,13 +10,14 @@ frame_2 = 0
 frame_3 = 0
 frame_4 = 0
 
-TIME_PER_ACTION = 0.5
+TIME_PER_ACTION = 0.6
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 image_p = None
 image_s = None
 image_b = None
 image_g = None
 bg = None
+select = 0
 
 def init():
     global image_p, image_s, image_b, image_g,bg
@@ -44,10 +45,18 @@ def finish():
 def draw():
     clear_canvas()
     bg.draw(800,450)
+    if select == 1:
+        draw_rectangle(100,250,300,550,255,0,0)
+    elif select == 2:
+        draw_rectangle(500,250,700,550,255,0,0)
+    elif select == 3:
+        draw_rectangle(900,250,1100,550,255,0,0)
+    elif select == 4:
+        draw_rectangle(1300,250,1500,550,255,0,0)
     image_p.clip_draw(int(frame_1) * 96, 0, 96, 84, 200, 400, 150, 150)
-    image_s.clip_draw(int(frame_2) * 96, 0, 96, 84, 400, 400, 150, 150)
-    image_b.clip_draw(int(frame_3) * 96, 0, 96, 84, 600, 400, 150, 150)
-    image_g.clip_draw(int(frame_4) * 96, 0, 96, 84, 800, 400, 150, 150)
+    image_s.clip_draw(int(frame_2) * 96, 0, 96, 84, 600, 400, 150, 150)
+    image_b.clip_draw(int(frame_3) * 96, 0, 96, 84, 1000, 400, 150, 150)
+    image_g.clip_draw(int(frame_4) * 96, 0, 96, 84, 1400, 400, 150, 150)
     update_canvas()
 
 def handle_events():
