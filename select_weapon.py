@@ -20,3 +20,20 @@ def init():
         image_b = load_image('BowFire01-sheet.png')
     if image_g == None:
         image_g = load_image('GunFire.png')
+
+def update():
+    pass
+
+def finish():
+    pass
+
+def draw():
+    pass
+
+def handle_events():
+    pass
+
+def pause():
+    pass
+def resume():
+    pass
