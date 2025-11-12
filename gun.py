@@ -163,6 +163,20 @@ class Gun:
         self.state_machine.update()
 
     def handle_event(self, event):
+        if self.player_id == 1:
+            if event.type == SDL_KEYDOWN:
+                if event.key not in (SDLK_a, SDLK_d, SDLK_SPACE):
+                    return
+            elif event.type == SDL_KEYUP:
+                if event.key not in (SDLK_a, SDLK_d):
+                    return
+        else:
+            if event.type == SDL_KEYDOWN:
+                if event.key not in (SDLK_LEFT, SDLK_RIGHT, SDLK_RETURN):
+                    return
+            elif event.type == SDL_KEYUP:
+                if event.key not in (SDLK_LEFT, SDLK_RIGHT):
+                    return
         self.state_machine.handle_state_event(('INPUT', event))
         pass
 
