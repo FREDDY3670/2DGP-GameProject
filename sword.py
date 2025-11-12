@@ -157,7 +157,7 @@ class Sword:
         if Sword.image_ra == None:
             Sword.image_ra = load_image('SwordRunSlash01_right.png')
 
-        player_id = player_id
+        self.player_id = player_id
         self.x, self.y = start_x, start_y
         self.frame = 0
         self.face_dir = 1 if player_id == 1 else -1
@@ -177,6 +177,20 @@ class Sword:
         self.state_machine.update()
 
     def handle_event(self, event):
+        if self.player_id == 1:
+            if event.type == SDL_KEYDOWN:
+                if event.key not in (SDLK_a, SDLK_d, SDLK_RETURN):
+                    return
+            elif event.type == SDL_KEYUP:
+                if event.key not in (SDLK_a, SDLK_d):
+                    return
+        else:
+            if event.type == SDL_KEYDOWN:
+                if event.key not in (SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE):
+                    return
+            elif event.type == SDL_KEYUP:
+                if event.key not in (SDLK_LEFT, SDLK_RIGHT):
+                    return
         self.state_machine.handle_state_event(('INPUT', event))
         pass
 
