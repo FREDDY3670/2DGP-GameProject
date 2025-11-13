@@ -1,5 +1,6 @@
 from pico2d import load_image
-from sdl2 import SDL_KEYDOWN, SDLK_LEFT, SDLK_RIGHT, SDL_KEYUP, SDLK_SPACE, SDLK_d, SDLK_a, SDLK_RETURN
+from sdl2 import SDL_KEYDOWN, SDLK_LEFT, SDLK_RIGHT, SDL_KEYUP, SDLK_SPACE, SDLK_d, SDLK_a, SDLK_RETURN, SDLK_w, \
+    SDLK_UP, SDLK_s, SDLK_DOWN
 
 import game_framework
 from state_machine import StateMachine
@@ -23,6 +24,22 @@ def right_up(e):
 def left_up(e):
     return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
             (e[1].key == SDLK_LEFT or e[1].key == SDLK_a))
+
+def up_down(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
+            (e[1].key == SDLK_w) or e[1].key == SDLK_UP)
+
+def up_up(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
+            (e[1].key == SDLK_w) or e[1].key == SDLK_UP)
+
+def down_down(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
+            (e[1].key == SDLK_s) or e[1].key == SDLK_DOWN)
+
+def down_up(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
+            (e[1].key == SDLK_s) or e[1].key == SDLK_DOWN)
 
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
 RUN_SPEED_KMPH = 40.0  # Km / Hour
