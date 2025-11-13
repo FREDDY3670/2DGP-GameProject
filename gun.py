@@ -1,4 +1,4 @@
-from pico2d import load_image
+from pico2d import load_image, draw_rectangle
 from sdl2 import SDL_KEYDOWN, SDLK_LEFT, SDLK_RIGHT, SDL_KEYUP, SDLK_SPACE, SDLK_a, SDLK_d, SDLK_RETURN
 
 import game_framework
@@ -55,6 +55,9 @@ class Idle:
         self.gun = Gun
         self.atk = False
         self.atk_frame = 5
+
+    def get_bb(self):
+        return self.gun.x - 30, self.gun.y - 100, self.gun.x + 30, self.gun.y
     def enter(self,e):
         self.gun.frame = 0
         if left_up(e):
@@ -73,6 +76,7 @@ class Idle:
                 self.atk = False
                 self.gun.frame = 0
     def draw(self):
+        draw_rectangle(*self.get_bb())
         if self.atk == False:
             if self.gun.face_dir == 1:
                 self.gun.image_idle.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
@@ -93,6 +97,9 @@ class Run:
         self.gun = Gun
         self.atk = False
         self.atk_frame = 8
+
+    def get_bb(self):
+        return self.gun.x - 30, self.gun.y - 100, self.gun.x + 30, self.gun.y
     def enter(self,e):
         if left_down(e):
             self.gun.face_dir = -1
@@ -115,6 +122,7 @@ class Run:
 
         self.gun.x += self.gun.face_dir * RUN_SPEED_PPS * game_framework.frame_time
     def draw(self):
+        draw_rectangle(*self.get_bb())
         if self.atk == False:
             if self.gun.face_dir == 1:
                 self.gun.image_run.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200,
@@ -162,9 +170,6 @@ class Gun:
                 self.RUN: {space_down : self.RUN, left_up : self.IDLE, right_up : self.IDLE, right_down : self.IDLE, left_down : self.IDLE}
             }
         )
-
-    def get_bb(self):
-        pass
 
     def update(self):
         self.state_machine.update()
