@@ -1,4 +1,4 @@
-from pico2d import load_image
+from pico2d import load_image, draw_rectangle
 from sdl2 import SDL_KEYDOWN, SDLK_LEFT, SDLK_RIGHT, SDL_KEYUP, SDLK_SPACE, SDLK_d, SDLK_a, SDLK_RETURN, SDLK_w, \
     SDLK_UP, SDLK_s, SDLK_DOWN
 
@@ -58,7 +58,10 @@ class Run:
         self.atk_frame = 8
 
     def get_bb(self):
-        pass
+        if self.atk == False:
+            return self.Sword.x - 40, self.Sword.y - 42, self.Sword.x + 40, self.Sword.y + 42
+        else:
+            return self.Sword.x - 50, self.Sword.y - 42, self.Sword.x + 50, self.Sword.y + 42
 
     def enter(self, e):
         if right_down(e):
@@ -84,6 +87,7 @@ class Run:
         self.Sword.x += self.Sword.face_dir * RUN_SPEED_PPS * game_framework.frame_time
 
     def draw(self):
+        draw_rectangle(*self.get_bb())
         if self.atk == False:
             if self.Sword.face_dir == 1:  # right
                 self.Sword.image_run.clip_draw(int(self.Sword.frame) * 96, 0, 96, 84, self.Sword.x, self.Sword.y, 200,
