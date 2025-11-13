@@ -57,7 +57,10 @@ class Idle:
         self.atk_frame = 5
 
     def get_bb(self):
-        return self.gun.x - 30, self.gun.y - 100, self.gun.x + 30, self.gun.y
+        if self.atk == False:
+            return self.gun.x - 30, self.gun.y - 100, self.gun.x + 30, self.gun.y
+        else:
+            return self.gun.x - 35, self.gun.y - 100, self.gun.x + 35, self.gun.y
     def enter(self,e):
         self.gun.frame = 0
         if left_up(e):
@@ -99,7 +102,10 @@ class Run:
         self.atk_frame = 8
 
     def get_bb(self):
-        return self.gun.x - 30, self.gun.y - 100, self.gun.x + 30, self.gun.y
+        if self.gun.face_dir == 1:
+            return self.gun.x - 40, self.gun.y - 100, self.gun.x + 50, self.gun.y
+        else:
+            return self.gun.x - 50, self.gun.y - 100, self.gun.x + 40, self.gun.y
     def enter(self,e):
         if left_down(e):
             self.gun.face_dir = -1
