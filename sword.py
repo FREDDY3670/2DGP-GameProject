@@ -123,14 +123,24 @@ class Idle:
         if self.atk == False:
             return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
         else:
-            if self.row == 0:
-                return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 50, self.Sword.y
-            elif self.row == 1:
-                return self.Sword.x - 15, self.Sword.y - 100, self.Sword.x + 55, self.Sword.y
-            elif self.row == 2:
-                return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 40, self.Sword.y
-            elif self.row == 3:
-                return self.Sword.x - 50, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
+            if self.Sword.face_dir == 1:
+                if self.row == 0:
+                    return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 50, self.Sword.y
+                elif self.row == 1:
+                    return self.Sword.x - 15, self.Sword.y - 100, self.Sword.x + 55, self.Sword.y
+                elif self.row == 2:
+                    return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 40, self.Sword.y
+                elif self.row == 3:
+                    return self.Sword.x - 50, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
+            else:
+                if self.row == 0:
+                    return self.Sword.x - 50, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
+                elif self.row == 1:
+                    return self.Sword.x - 55, self.Sword.y - 100, self.Sword.x + 15, self.Sword.y
+                elif self.row == 2:
+                    return self.Sword.x - 40, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
+                elif self.row == 3:
+                    return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 50, self.Sword.y
 
     def exit(self, e):
         pass
