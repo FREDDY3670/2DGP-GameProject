@@ -159,7 +159,8 @@ class Idle:
 
 class Jump:
     def __init__(self,Sword):
-        pass
+        self.Sword = Sword
+        self.atk = False
     def enter(self,e):
         pass
     def exit(self,e):
@@ -168,7 +169,7 @@ class Jump:
         pass
     def draw(self):
         pass
-    
+
 
 class Sword:
     image_idle = None
