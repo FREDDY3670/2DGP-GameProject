@@ -119,6 +119,18 @@ class Idle:
             self.atk_count += 1
             self.combo_timer = 0
             self.Sword.frame = 0
+    def get_bb(self):
+        if self.atk == False:
+            return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
+        else:
+            if self.row == 0:
+                return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 50, self.Sword.y
+            elif self.row == 1:
+                return self.Sword.x - 15, self.Sword.y - 100, self.Sword.x + 55, self.Sword.y
+            elif self.row == 2:
+                return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 40, self.Sword.y
+            elif self.row == 3:
+                return self.Sword.x - 50, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
 
     def exit(self, e):
         pass
@@ -149,6 +161,7 @@ class Idle:
                     self.Sword.frame = 0
 
     def draw(self):
+        draw_rectangle(*self.get_bb())
         if self.atk == False:
             if self.Sword.face_dir == 1:  # right
                 self.Sword.image_idle.clip_draw(int(self.Sword.frame) * 96, 0, 96, 84, self.Sword.x, self.Sword.y, 200,
