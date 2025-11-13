@@ -158,7 +158,17 @@ class Idle:
                                                         self.Sword.x, self.Sword.y, 200, 200)
 
 class Jump:
-    pass
+    def __init__(self,Sword):
+        pass
+    def enter(self,e):
+        pass
+    def exit(self,e):
+        pass
+    def do(self):
+        pass
+    def draw(self):
+        pass
+    
 
 class Sword:
     image_idle = None
