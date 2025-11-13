@@ -157,6 +157,8 @@ class Idle:
                 self.Sword.image_ia.clip_composite_draw(int(self.Sword.frame) * 96, self.row * 84, 96, 84, 0, 'h',
                                                         self.Sword.x, self.Sword.y, 200, 200)
 
+class Jump:
+    pass
 
 class Sword:
     image_idle = None
