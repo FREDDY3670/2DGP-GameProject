@@ -57,6 +57,9 @@ class Run:
         self.atk = False
         self.atk_frame = 8
 
+    def get_bb(self):
+        pass
+
     def enter(self, e):
         if right_down(e):
             self.Sword.face_dir = 1
@@ -202,9 +205,6 @@ class Sword:
                 self.RUN: {left_up : self.IDLE, right_up : self.IDLE, right_down : self.IDLE, left_down : self.IDLE,space_down : self.RUN}
             }
         )
-
-    def get_bb(self):
-        pass
     def update(self):
         self.state_machine.update()
 
