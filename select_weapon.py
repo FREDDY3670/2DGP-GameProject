@@ -98,6 +98,7 @@ def handle_events():
                         player1_weapon = 'Bow'
                     elif select == 3:
                         player1_weapon = 'Gun'
+                    print(player1_weapon)
                     select = 0
                 elif player2_weapon == None:
                     if select == 0:
@@ -108,6 +109,7 @@ def handle_events():
                         player2_weapon = 'Bow'
                     elif select == 3:
                         player2_weapon = 'Gun'
+                    print(player2_weapon)
                     select = 0
 
 

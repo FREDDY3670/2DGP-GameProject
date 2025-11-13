@@ -24,30 +24,38 @@ def handle_events():
 
 
 def init():
+    p1_w = select_weapon.player1_weapon
+    p2_w = select_weapon.player2_weapon
+    print(p1_w, p2_w)
+
     map = Map()
     game_world.add_object(map, 0)
 
     tile = Tile()
     game_world.add_object(tile, 0)
-    if select_weapon.player1_weapon == 'Gun':
+    player1 = None
+    if p1_w == 'Gun':
         player1 = Gun(player_id=1, start_x=200, start_y=180)
-    elif select_weapon.player1_weapon == 'Sword':
+    elif p1_w == 'Sword':
         player1 = Sword(player_id=1, start_x=200, start_y=180)
     # elif select_weapon.player1_weapon == 'Bow':
     #     player1 = Bow(player_id=1, start_x=200, start_y=180)
     # elif select_weapon.player1_weapon == 'Punch':
     #     player1 = Punch(player_id=1, start_x=200, start_y=180)
-    game_world.add_object(player1, 1)
+    if player1:
+        game_world.add_object(player1, 1)
 
-    if select_weapon.player2_weapon == 'Gun':
+    player2 = None
+    if p2_w == 'Gun':
         player2 = Gun(player_id=2, start_x=1400, start_y=180)
-    elif select_weapon.player2_weapon == 'Sword':
+    elif p2_w == 'Sword':
         player2 = Sword(player_id=2, start_x=1400, start_y=180)
     # elif select_weapon.player2_weapon == 'Bow':
     #     player2 = Bow(player_id=2, start_x=1400, start_y=180)
     # elif select_weapon.player2_weapon == 'Punch':
     #     player2 = Punch(player_id=2, start_x=1400, start_y=180)
-    game_world.add_object(player2, 1)
+    if player2:
+        game_world.add_object(player2, 1)
 
 def update():
     game_world.update()
