@@ -59,9 +59,9 @@ class Run:
 
     def get_bb(self):
         if self.atk == False:
-            return self.Sword.x - 40, self.Sword.y - 42, self.Sword.x + 40, self.Sword.y + 42
+            return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
         else:
-            return self.Sword.x - 50, self.Sword.y - 42, self.Sword.x + 50, self.Sword.y + 42
+            return self.Sword.x - 40, self.Sword.y - 100, self.Sword.x + 40, self.Sword.y
 
     def enter(self, e):
         if right_down(e):
