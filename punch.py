@@ -4,10 +4,32 @@ import game_framework
 from state_machine import StateMachine
 
 class Run:
-    pass
+    def __init__(self, Punch):
+        pass
+    def enter(self,e):
+        pass
+    def exit(self,e):
+        pass
+    def do(self):
+        pass
+    def draw(self):
+        pass
 
 class Idle:
-    pass
+    def __init__(self, Punch):
+        pass
+
+    def enter(self, e):
+        pass
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        pass
+
+    def draw(self):
+        pass
 
 class Punch:
     image_ia1 = None
