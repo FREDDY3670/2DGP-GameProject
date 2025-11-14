@@ -10,4 +10,5 @@ class Idle:
     pass
 
 class Punch:
-    pass
+    def __init__(self, player_id = 1, start_x = 100, start_y = 180):
+        pass
