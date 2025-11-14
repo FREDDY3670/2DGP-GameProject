@@ -1,7 +1,45 @@
 from pico2d import load_image
+from sdl2 import SDLK_SPACE, SDL_KEYDOWN, SDLK_RETURN, SDLK_a, SDLK_LEFT, SDLK_RIGHT, SDLK_d, SDLK_w, SDLK_UP, \
+    SDL_KEYUP, SDLK_DOWN, SDLK_s
 
 import game_framework
 from state_machine import StateMachine
+
+def space_down(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
+            (e[1].key == SDLK_SPACE or e[1].key == SDLK_RETURN))
+
+def left_down(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
+            (e[1].key == SDLK_LEFT or e[1].key == SDLK_a))
+
+def right_down(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
+            (e[1].key == SDLK_RIGHT or e[1].key == SDLK_d))
+
+def right_up(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
+            (e[1].key == SDLK_RIGHT or e[1].key == SDLK_d))
+
+def left_up(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
+            (e[1].key == SDLK_LEFT or e[1].key == SDLK_a))
+
+def up_down(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
+            (e[1].key == SDLK_w) or e[1].key == SDLK_UP)
+
+def up_up(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
+            (e[1].key == SDLK_w) or e[1].key == SDLK_UP)
+
+def down_down(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
+            (e[1].key == SDLK_s) or e[1].key == SDLK_DOWN)
+
+def down_up(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
+            (e[1].key == SDLK_s) or e[1].key == SDLK_DOWN)
 
 class Run:
     def __init__(self, Punch):
@@ -46,6 +84,18 @@ class Punch:
         self.x, self.y = start_x, start_y
         self.frame = 0
         self.face_dir = 1 if player_id == 1 else -1
+
+        self.IDLE = Idle(self)
+        self.RUN = Run(self)
+
+        self.state_machine = StateMachine(
+            self.IDLE,
+            {
+                self.IDLE: {left_down: self.RUN, right_down: self.RUN, space_down: self.IDLE},
+                self.RUN: {left_up: self.IDLE, right_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE,
+                           space_down: self.RUN}
+            }
+        )
 
     def update(self):
         pass
