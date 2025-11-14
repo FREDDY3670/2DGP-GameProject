@@ -54,14 +54,25 @@ FRAMES_PER_ACTION = 8
 class Run:
     def __init__(self, Punch):
         self.Punch = Punch
-    def enter(self,e):
+
+    def enter(self, e):
+        if right_down(e):
+            self.Punch.face_dir = 1
+        elif left_down(e):
+            self.Punch.face_dir = -1
+
+    def exit(self, e):
         pass
-    def exit(self,e):
-        pass
+
     def do(self):
-        pass
+        self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        self.Punch.x += self.Punch.face_dir * RUN_SPEED_PPS * game_framework.frame_time
+
     def draw(self):
-        pass
+        if self.Punch.face_dir == 1:
+            self.Punch.image_run.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200, 200)
+        else:
+            self.Punch.image_run.clip_composite_draw(int(self.Punch.frame) * 96, 0, 96, 84, 0, 'h', self.Punch.x, self.Punch.y, 200, 200)
 
 class Idle:
     def __init__(self, Punch):
@@ -144,6 +155,7 @@ class Punch:
     image_ia2 = None
     image_ia3 = None
     image_idle = None
+    image_run = None
     def __init__(self, player_id = 1, start_x = 100, start_y = 180):
         if Punch.image_ia1 == None:
             Punch.image_ia1 = load_image('Punch0101-sheet.png')
@@ -153,6 +165,8 @@ class Punch:
             Punch.image_ia3 = load_image('Punch0301-sheet.png')
         if Punch.image_idle == None:
             Punch.image_idle = load_image('Idle01-sheet.png')
+        if Punch.image_run == None:
+            Punch.image_run = load_image('Run.png')
         self.player_id = player_id
         self.x, self.y = start_x, start_y
         self.frame = 0
