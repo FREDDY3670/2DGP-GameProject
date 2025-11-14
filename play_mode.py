@@ -3,6 +3,7 @@ from map import Map
 import game_framework
 import game_world
 from gun import Gun
+from punch import Punch
 from sword import Sword
 from tile import Tile
 import select_weapon
@@ -40,8 +41,8 @@ def init():
         player1 = Sword(player_id=1, start_x=200, start_y=180)
     # elif select_weapon.player1_weapon == 'Bow':
     #     player1 = Bow(player_id=1, start_x=200, start_y=180)
-    # elif select_weapon.player1_weapon == 'Punch':
-    #     player1 = Punch(player_id=1, start_x=200, start_y=180)
+    elif select_weapon.player1_weapon == 'Punch':
+        player1 = Punch(player_id=1, start_x=200, start_y=180)
     if player1:
         game_world.add_object(player1, 1)
 

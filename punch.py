@@ -41,6 +41,16 @@ def down_up(e):
     return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
             (e[1].key == SDLK_s) or e[1].key == SDLK_DOWN)
 
+PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
+RUN_SPEED_KMPH = 40.0  # Km / Hour
+RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+TIME_PER_ACTION = 0.5
+ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+FRAMES_PER_ACTION = 8
+
 class Run:
     def __init__(self, Punch):
         self.Punch = Punch
@@ -56,18 +66,31 @@ class Run:
 class Idle:
     def __init__(self, Punch):
         self.Punch = Punch
+        self.atk = False
+        self.atk_count = 0
 
     def enter(self, e):
-        pass
+        if space_down(e):
+            self.atk = True
+            self.Punch.frame = 0
+            self.atk_count += 1
 
     def exit(self, e):
         pass
 
     def do(self):
-        pass
+        if self.atk == False:
+            self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 7
+        else:
+            self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 6
 
     def draw(self):
-        pass
+        if self.atk == False:
+            self.Punch.image_idle.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,
+                                                200)
+        else:
+            self.Punch.image_ia1.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,200)
+
 
 class Punch:
     image_ia1 = None
