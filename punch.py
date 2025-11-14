@@ -68,6 +68,9 @@ class Idle:
         self.Punch = Punch
         self.atk = False
         self.atk_count = 0
+        self.combo_timer = 0
+        self.COMBO_TIME_LIMIT = 0.75
+        self.atk_frame = 0
 
     def enter(self, e):
         if space_down(e):
