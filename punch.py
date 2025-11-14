@@ -73,7 +73,10 @@ class Idle:
         if space_down(e):
             self.atk = True
             self.Punch.frame = 0
-            self.atk_count += 1
+            if self.atk_count == 3:
+                self.atk_count = 1
+            else:
+                self.atk_count += 1
 
     def exit(self, e):
         pass
@@ -82,14 +85,24 @@ class Idle:
         if self.atk == False:
             self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 7
         else:
-            self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 6
+            if self.atk_count == 1:
+                self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 6
+            elif self.atk_count == 2:
+                self.Punch.frame = ( self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 4
+            elif self.atk_count == 3:
+                self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 7
 
     def draw(self):
         if self.atk == False:
             self.Punch.image_idle.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,
                                                 200)
         else:
-            self.Punch.image_ia1.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,200)
+            if self.atk_count == 1:
+                self.Punch.image_ia1.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,200)
+            elif self.atk_count == 2:
+                self.Punch.image_ia2.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,200)
+            elif self.atk_count == 3:
+                self.Punch.image_ia3.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,200)
 
 
 class Punch:
