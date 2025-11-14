@@ -80,6 +80,7 @@ class Idle:
                 self.atk_count = 1
             else:
                 self.atk_count += 1
+            self.combo_timer = 0
 
     def exit(self, e):
         pass
@@ -87,26 +88,56 @@ class Idle:
     def do(self):
         if self.atk == False:
             self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 7
+            if self.atk_count > 0:
+                self.combo_timer += game_framework.frame_time
+                if self.combo_timer >= self.COMBO_TIME_LIMIT:
+                    self.atk_count = 0
+                    self.combo_timer = 0
+                    self.Punch.frame = 0
         else:
-            if self.atk_count == 1:
-                self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 6
-            elif self.atk_count == 2:
-                self.Punch.frame = ( self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 4
-            elif self.atk_count == 3:
-                self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 7
+            if self.atk_frame == 0:
+                if self.atk_count == 1:
+                    self.atk_frame = 6
+                elif self.atk_count == 2:
+                    self.atk_frame = 4
+                elif self.atk_count == 3:
+                    self.atk_frame = 7
+
+            self.Punch.frame = (self.Punch.frame + 7 * ACTION_PER_TIME * game_framework.frame_time)
+            if self.Punch.frame >= self.atk_frame:
+                self.atk = False
+                self.atk_frame = 0
+                self.combo_timer = 0
+                self.Punch.frame = 0
 
     def draw(self):
         if self.atk == False:
-            self.Punch.image_idle.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,
+            if self.Punch.face_dir == 1:
+                self.Punch.image_idle.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,
                                                 200)
+            else:
+                self.Punch.image_idle.clip_composite_draw(int(self.Punch.frame) * 96, 0, 96, 84, 0, 'h', self.Punch.x,
+                                                          self.Punch.y, 200, 200)
         else:
-            if self.atk_count == 1:
-                self.Punch.image_ia1.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,200)
-            elif self.atk_count == 2:
-                self.Punch.image_ia2.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,200)
-            elif self.atk_count == 3:
-                self.Punch.image_ia3.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,200)
-
+            if self.Punch.face_dir == 1:
+                if self.atk_count == 1:
+                    self.Punch.image_ia1.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y,
+                                                   200, 200)
+                elif self.atk_count == 2:
+                    self.Punch.image_ia2.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y,
+                                                   200, 200)
+                elif self.atk_count == 3:
+                    self.Punch.image_ia3.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y,
+                                                   200, 200)
+            else:
+                if self.atk_count == 1:
+                    self.Punch.image_ia1.clip_composite_draw(int(self.Punch.frame) * 96, 0, 96, 84, 0, 'h',
+                                                             self.Punch.x, self.Punch.y, 200, 200)
+                elif self.atk_count == 2:
+                    self.Punch.image_ia2.clip_composite_draw(int(self.Punch.frame) * 96, 0, 96, 84, 0, 'h',
+                                                             self.Punch.x, self.Punch.y, 200, 200)
+                elif self.atk_count == 3:
+                    self.Punch.image_ia3.clip_composite_draw(int(self.Punch.frame) * 96, 0, 96, 84, 0, 'h', self.Punch.x, self.Punch.y, 200, 200)
 
 class Punch:
     image_ia1 = None
