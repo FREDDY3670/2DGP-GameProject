@@ -43,7 +43,7 @@ def down_up(e):
 
 class Run:
     def __init__(self, Punch):
-        pass
+        self.Punch = Punch
     def enter(self,e):
         pass
     def exit(self,e):
@@ -55,7 +55,7 @@ class Run:
 
 class Idle:
     def __init__(self, Punch):
-        pass
+        self.Punch = Punch
 
     def enter(self, e):
         pass
@@ -73,6 +73,7 @@ class Punch:
     image_ia1 = None
     image_ia2 = None
     image_ia3 = None
+    image_idle = None
     def __init__(self, player_id = 1, start_x = 100, start_y = 180):
         if Punch.image_ia1 == None:
             Punch.image_ia1 = load_image('Punch0101-sheet.png')
@@ -80,6 +81,8 @@ class Punch:
             Punch.image_ia2 = load_image('Punch0201-sheet.png')
         if Punch.image_ia3 == None:
             Punch.image_ia3 = load_image('Punch0301-sheet.png')
+        if Punch.image_idle == None:
+            Punch.image_idle = load_image('Idle01-sheet.png')
         self.player_id = player_id
         self.x, self.y = start_x, start_y
         self.frame = 0
