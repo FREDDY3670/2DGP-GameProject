@@ -63,6 +63,34 @@ class Run:
         else:
             return self.Sword.x - 40, self.Sword.y - 100, self.Sword.x + 40, self.Sword.y
 
+    def get_weapon_bb(self):
+        if not self.atk:
+            return None
+
+        frame = int(self.Sword.frame)
+
+        # 달리기 공격: 수평 베기
+        if self.Sword.face_dir == 1:
+            if frame <= 2:
+                return self.Sword.x + 10, self.Sword.y - 60, self.Sword.x + 50, self.Sword.y - 10
+            elif frame <= 4:
+                return self.Sword.x + 30, self.Sword.y - 65, self.Sword.x + 90, self.Sword.y - 15
+            elif frame <= 6:
+                return self.Sword.x + 40, self.Sword.y - 60, self.Sword.x + 100, self.Sword.y - 20
+            else:
+                return self.Sword.x + 20, self.Sword.y - 65, self.Sword.x + 70, self.Sword.y - 15
+        else:
+            if frame <= 2:
+                return self.Sword.x - 50, self.Sword.y - 60, self.Sword.x - 10, self.Sword.y - 10
+            elif frame <= 4:
+                return self.Sword.x - 90, self.Sword.y - 65, self.Sword.x - 30, self.Sword.y - 15
+            elif frame <= 6:
+                return self.Sword.x - 100, self.Sword.y - 60, self.Sword.x - 40, self.Sword.y - 20
+            else:
+                return self.Sword.x - 70, self.Sword.y - 65, self.Sword.x - 20, self.Sword.y - 15
+
+        return None
+
     def enter(self, e):
         if right_down(e):
             self.Sword.face_dir = 1
@@ -88,6 +116,8 @@ class Run:
 
     def draw(self):
         draw_rectangle(*self.get_bb())
+        if self.atk:
+            draw_rectangle(*self.get_weapon_bb())
         if self.atk == False:
             if self.Sword.face_dir == 1:  # right
                 self.Sword.image_run.clip_draw(int(self.Sword.frame) * 96, 0, 96, 84, self.Sword.x, self.Sword.y, 200,
@@ -142,15 +172,81 @@ class Idle:
                 elif self.row == 3:
                     return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 50, self.Sword.y
 
+    def get_weapon_bb(self):
+        if not self.atk:
+            return None
+
+        frame = int(self.Sword.frame)
+
+        if self.row == 0:
+            if self.Sword.face_dir == 1:
+                if frame <= 1:
+                    return self.Sword.x - 30, self.Sword.y - 60 , self.Sword.x - 10 , self.Sword.y
+                elif frame == 2:
+                    return self.Sword.x - 25, self.Sword.y - 60, self.Sword.x , self.Sword.y
+                elif frame == 3:
+                    return self.Sword.x, self.Sword.y - 60, self.Sword.x + 30, self.Sword.y
+                else:
+                    return self.Sword.x + 20, self.Sword.y - 70, self.Sword.x + 70, self.Sword.y - 40
+            else:
+                if frame <= 1:
+                    return self.Sword.x + 10, self.Sword.y - 60 , self.Sword.x + 30 , self.Sword.y
+                elif frame == 2:
+                    return self.Sword.x , self.Sword.y - 60, self.Sword.x + 25, self.Sword.y
+                elif frame == 3:
+                    return self.Sword.x - 30, self.Sword.y - 60, self.Sword.x , self.Sword.y
+                else:
+                    return self.Sword.x - 70, self.Sword.y - 70, self.Sword.x - 20, self.Sword.y - 40
+
+        elif self.row == 1:
+            if self.Sword.face_dir == 1:
+                return self.Sword.x + 10, self.Sword.y - 70, self.Sword.x + 100, self.Sword.y - 40
+            else:
+                return self.Sword.x - 100, self.Sword.y - 70, self.Sword.x - 10, self.Sword.y - 40
+
+        elif self.row == 2:
+            if self.Sword.face_dir == 1:
+                if frame == 1 or frame == 2:
+                    return self.Sword.x + 10, self.Sword.y - 40, self.Sword.x + 100, self.Sword.y - 10
+                elif frame == 3:
+                    return self.Sword.x - 30, self.Sword.y - 50, self.Sword.x + 90, self.Sword.y + 40
+                else:
+                    return self.Sword.x - 30, self.Sword.y - 50, self.Sword.x , self.Sword.y + 40
+            else:
+                if frame == 1 or frame == 2:
+                    return self.Sword.x - 100, self.Sword.y - 40, self.Sword.x - 10, self.Sword.y - 10
+                elif frame == 3:
+                    return self.Sword.x - 90, self.Sword.y - 50, self.Sword.x + 30, self.Sword.y + 40
+                else:
+                    return self.Sword.x , self.Sword.y - 50, self.Sword.x + 30, self.Sword.y + 40
+
+        elif self.row == 3:
+            if self.Sword.face_dir == 1:
+                if frame == 1 or frame == 2 or frame == 0:
+                    return self.Sword.x - 50, self.Sword.y - 30, self.Sword.x - 20, self.Sword.y + 20
+                elif frame == 3 or frame == 4:
+                    return self.Sword.x - 50, self.Sword.y - 100, self.Sword.x + 75, self.Sword.y + 25
+                else:
+                    return self.Sword.x - 20, self.Sword.y - 20, self.Sword.x + 20, self.Sword.y + 30
+            else:
+                if frame == 1 or frame == 2 or frame == 0:
+                    return self.Sword.x + 20, self.Sword.y - 30, self.Sword.x + 50, self.Sword.y + 20
+                elif frame == 3 or frame == 4:
+                    return self.Sword.x - 75, self.Sword.y - 100, self.Sword.x + 50, self.Sword.y + 25
+                else:
+                    return self.Sword.x - 20, self.Sword.y - 20, self.Sword.x + 20, self.Sword.y + 30
+
+        return None
+
     def exit(self, e):
         pass
 
     def do(self):
         if self.atk:
             if self.atk_frame == 0:
-                self.row = (self.atk_count - 1) % 4
+                self.row = (3 - self.atk_count + 1) % 4
                 if self.row == 0:
-                    self.atk_frame = 6
+                    self.atk_frame = 8
                 elif self.row == 1 or self.row == 2:
                     self.atk_frame = 5
                 elif self.row == 3:
@@ -172,6 +268,8 @@ class Idle:
 
     def draw(self):
         draw_rectangle(*self.get_bb())
+        if self.atk:
+            draw_rectangle(*self.get_weapon_bb())
         if self.atk == False:
             if self.Sword.face_dir == 1:  # right
                 self.Sword.image_idle.clip_draw(int(self.Sword.frame) * 96, 0, 96, 84, self.Sword.x, self.Sword.y, 200,
