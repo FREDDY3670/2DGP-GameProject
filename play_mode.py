@@ -51,10 +51,8 @@ def init():
         player2 = Gun(player_id=2, start_x=1400, start_y=180)
     elif p2_w == 'Sword':
         player2 = Sword(player_id=2, start_x=1400, start_y=180)
-    # elif select_weapon.player2_weapon == 'Bow':
-    #     player2 = Bow(player_id=2, start_x=1400, start_y=180)
-    # elif select_weapon.player2_weapon == 'Punch':
-    #     player2 = Punch(player_id=2, start_x=1400, start_y=180)
+    elif select_weapon.player2_weapon == 'Punch':
+        player2 = Punch(player_id=2, start_x=1400, start_y=180)
     if player2:
         game_world.add_object(player2, 1)
 
