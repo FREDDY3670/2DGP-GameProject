@@ -332,9 +332,12 @@ class Sword:
             }
         )
     def update(self):
-        self.state_machine.update()
         self.prev_x = self.x
         self.prev_y = self.y
+        self.state_machine.update()
+
+    def get_bb(self):
+        return self.state_machine.cur_state.get_bb()
 
     def handle_event(self, event):
         if self.player_id == 1:
@@ -359,4 +362,15 @@ class Sword:
 
     def handle_collision(self, group, other):
         if group == 'player:tile':
-            pass
+            sword_left, sword_bottom, sword_right, sword_top = self.state_machine.cur_state.get_bb()
+            tile_left, tile_bottom, tile_right, tile_top = other.get_bb()
+
+            overlap_left = sword_right - tile_left
+            overlap_right = tile_right - sword_left
+
+            if overlap_left > 0 and overlap_left < overlap_right:
+                if self.x > self.prev_x:
+                    self.x = tile_left - 30
+            elif overlap_right > 0:
+                if self.x < self.prev_x:
+                    self.x = tile_right + 30
