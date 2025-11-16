@@ -298,7 +298,6 @@ class Jump:
     def draw(self):
         pass
 
-
 class Sword:
     image_idle = None
     image_run = None
@@ -319,6 +318,8 @@ class Sword:
         self.x, self.y = start_x, start_y
         self.frame = 0
         self.face_dir = 1 if player_id == 1 else -1
+        self.prev_x = start_x
+        self.prev_y = start_y
 
         self.IDLE = Idle(self)
         self.RUN = Run(self)
@@ -332,6 +333,8 @@ class Sword:
         )
     def update(self):
         self.state_machine.update()
+        self.prev_x = self.x
+        self.prev_y = self.y
 
     def handle_event(self, event):
         if self.player_id == 1:
@@ -353,3 +356,7 @@ class Sword:
 
     def draw(self):
         self.state_machine.draw()
+
+    def handle_collision(self, group, other):
+        if group == 'player:tile':
+            pass
