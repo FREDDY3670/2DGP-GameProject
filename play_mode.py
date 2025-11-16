@@ -32,8 +32,6 @@ def init():
     map = Map()
     game_world.add_object(map, 0)
 
-    tile = Tile()
-    game_world.add_object(tile, 0)
     player1 = None
     if p1_w == 'Gun':
         player1 = Gun(player_id=1, start_x=200, start_y=180)
@@ -55,6 +53,12 @@ def init():
         player2 = Punch(player_id=2, start_x=1400, start_y=180)
     if player2:
         game_world.add_object(player2, 1)
+
+    game_world.add_collision_pair('player:tile', player1, None)
+    game_world.add_collision_pair('player:tile', player2, None)
+
+    for tile in map.tiles:
+        game_world.add_collision_pair('player:tile', None, tile)
 
 def update():
     game_world.update()
