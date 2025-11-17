@@ -27,19 +27,19 @@ def left_up(e):
 
 def up_down(e):
     return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
-            (e[1].key == SDLK_w) or e[1].key == SDLK_UP)
+            (e[1].key == SDLK_w or e[1].key == SDLK_UP))
 
 def up_up(e):
     return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
-            (e[1].key == SDLK_w) or e[1].key == SDLK_UP)
+            (e[1].key == SDLK_w or e[1].key == SDLK_UP))
 
 def down_down(e):
     return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
-            (e[1].key == SDLK_s) or e[1].key == SDLK_DOWN)
+            (e[1].key == SDLK_s or e[1].key == SDLK_DOWN))
 
 def down_up(e):
     return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
-            (e[1].key == SDLK_s) or e[1].key == SDLK_DOWN)
+            (e[1].key == SDLK_s or e[1].key == SDLK_DOWN))
 
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
 RUN_SPEED_KMPH = 40.0  # Km / Hour
@@ -288,21 +288,35 @@ class Idle:
 class Jump:
     def __init__(self,Sword):
         self.Sword = Sword
-        self.atk = False
-    def enter(self,e):
-        pass
+
+    def get_bb(self):
+        return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
+
+    def enter(self, e):
+        if up_down(e) and self.Sword.on_ground:
+            self.Sword.velocity_y = self.Sword.jump_speed
+            self.Sword.on_ground = False
+        elif left_down(e):
+            self.Sword.face_dir = -1
+
     def exit(self,e):
         pass
     def do(self):
-        pass
+        self.Sword.frame = (self.Sword.frame + 6 * ACTION_PER_TIME * game_framework.frame_time) % 6
     def draw(self):
-        pass
+        if self.Sword.face_dir == 1:
+            self.Sword.image_air.clip_draw(int(self.Sword.frame) * 96, 84, 96, 84, self.Sword.x, self.Sword.y, 200,
+                                           200)
+        else:
+            self.Sword.image_air.clip_composite_draw(int(self.Sword.frame) * 96, 84, 96, 84, 0, 'h', self.Sword.x,
+                                                     self.Sword.y, 200, 200)
 
 class Sword:
     image_idle = None
     image_run = None
     image_ia = None
     image_ra = None
+    image_air = None
 
     def __init__(self, player_id = 1, start_x = 100, start_y = 180):
         if Sword.image_idle == None:
@@ -313,6 +327,8 @@ class Sword:
             Sword.image_ia = load_image('swordcombo.png')
         if Sword.image_ra == None:
             Sword.image_ra = load_image('SwordRunSlash01_right.png')
+        if Sword.image_air == None:
+            Sword.image_air = load_image('Air_Slash.png')
 
         self.player_id = player_id
         self.x, self.y = start_x, start_y
@@ -320,6 +336,12 @@ class Sword:
         self.face_dir = 1 if player_id == 1 else -1
         self.prev_x = start_x
         self.prev_y = start_y
+
+        self.velocity_y = 0
+        self.velocity_x = 0
+        self.gravity = 980
+        self.jump_speed = 400
+        self.on_ground = False
 
         self.IDLE = Idle(self)
         self.RUN = Run(self)
@@ -330,12 +352,25 @@ class Sword:
             {
                 self.IDLE: {left_down : self.RUN, right_down : self.RUN,space_down : self.IDLE, up_down : self.JUMP},
                 self.RUN: {left_up : self.IDLE, right_up : self.IDLE, right_down : self.IDLE, left_down : self.IDLE,space_down : self.RUN, up_down : self.JUMP},
-                self.JUMP: {}
+                self.JUMP: {right_down : self.JUMP, left_down : self.JUMP}
             }
         )
+
     def update(self):
         self.prev_x = self.x
         self.prev_y = self.y
+
+        # 타일과의 충돌 체크 전까지 공중에 있는 것으로 가정
+        self.on_ground = False
+
+        # 중력 적용
+        self.velocity_y -= self.gravity * game_framework.frame_time
+        self.y += self.velocity_y * game_framework.frame_time
+
+        # 좌우 이동
+        if self.velocity_x != 0:
+            self.x += self.velocity_x * game_framework.frame_time
+
         self.state_machine.update()
 
     def get_bb(self):
@@ -344,14 +379,14 @@ class Sword:
     def handle_event(self, event):
         if self.player_id == 1:
             if event.type == SDL_KEYDOWN:
-                if event.key not in (SDLK_a, SDLK_d, SDLK_SPACE):
+                if event.key not in (SDLK_a, SDLK_d, SDLK_SPACE, SDLK_w):
                     return
             elif event.type == SDL_KEYUP:
                 if event.key not in (SDLK_a, SDLK_d):
                     return
         else:
             if event.type == SDL_KEYDOWN:
-                if event.key not in (SDLK_LEFT, SDLK_RIGHT, SDLK_RETURN):
+                if event.key not in (SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_RETURN):
                     return
             elif event.type == SDL_KEYUP:
                 if event.key not in (SDLK_LEFT, SDLK_RIGHT):
@@ -367,9 +402,29 @@ class Sword:
             sword_left, sword_bottom, sword_right, sword_top = self.state_machine.cur_state.get_bb()
             tile_left, tile_bottom, tile_right, tile_top = other.get_bb()
 
+            overlap_bottom = sword_bottom - tile_top
+            overlap_top = tile_bottom - sword_top
+
             overlap_left = sword_right - tile_left
             overlap_right = tile_right - sword_left
 
+            if abs(overlap_bottom) < abs(overlap_top):
+                # 위에서 떨어지는 경우
+                if overlap_bottom <= 5 and overlap_left > 0 and overlap_right > 0:
+                    self.y = tile_top + 100
+                    self.velocity_y = 0
+                    self.on_ground = True
+                    if self.state_machine.cur_state == self.JUMP:
+                        self.state_machine.cur_state = self.IDLE
+                    return
+            else:
+                # 아래에서 충돌하는 경우
+                if overlap_top <= 5 and overlap_left > 0 and overlap_right > 0:
+                    self.y = tile_bottom - 100
+                    self.velocity_y = 0
+                    return
+
+            # 좌우 충돌
             if overlap_left > 0 and overlap_left < overlap_right:
                 if self.x > self.prev_x:
                     self.x = tile_left - 30
