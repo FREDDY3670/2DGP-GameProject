@@ -452,32 +452,40 @@ class Sword:
             sword_left, sword_bottom, sword_right, sword_top = self.state_machine.cur_state.get_bb()
             tile_left, tile_bottom, tile_right, tile_top = other.get_bb()
 
-            overlap_bottom = sword_bottom - tile_top
-            overlap_top = tile_bottom - sword_top
+            prev_left = self.prev_x - 30
+            prev_right = self.prev_x + 30
+            prev_bottom = self.prev_y - 100
+            prev_top = self.prev_y
 
-            overlap_left = sword_right - tile_left
-            overlap_right = tile_right - sword_left
+            overlap_x = min(sword_right - tile_left, tile_right - sword_left)
+            overlap_y = min(sword_top - tile_bottom, tile_top - sword_bottom)
 
-            if abs(overlap_bottom) < abs(overlap_top):
-                # 위에서 떨어지는 경우
-                if overlap_bottom <= 5 and overlap_left > 0 and overlap_right > 0:
+            was_above = prev_bottom >= tile_top
+            was_below = prev_top <= tile_bottom
+            was_left = prev_right <= tile_left
+            was_right = prev_left >= tile_right
+
+            if overlap_y < overlap_x:
+                if was_above:
                     self.y = tile_top + 100
                     self.velocity_y = 0
                     self.on_ground = True
-                    if self.state_machine.cur_state == self.JUMP:
+                    if isinstance(self.state_machine.cur_state, Jump):
                         self.state_machine.cur_state = self.IDLE
                     return
-            else:
-                # 아래에서 충돌하는 경우
-                if overlap_top <= 5 and overlap_left > 0 and overlap_right > 0:
-                    self.y = tile_bottom - 100
+
+                if was_below and self.velocity_y > 0:
+                    self.y = tile_bottom
                     self.velocity_y = 0
                     return
 
-            # 좌우 충돌
-            if overlap_left > 0 and overlap_left < overlap_right:
-                if self.x > self.prev_x:
+            else:
+                if was_left:
                     self.x = tile_left - 30
-            elif overlap_right > 0:
-                if self.x < self.prev_x:
+                    self.velocity_x = 0
+                    return
+
+                if was_right:
                     self.x = tile_right + 30
+                    self.velocity_x = 0
+                    return
