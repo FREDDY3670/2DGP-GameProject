@@ -112,7 +112,14 @@ class Run:
                 self.Sword.frame = 0
         else:
             self.Sword.frame = (self.Sword.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
-        self.Sword.x += self.Sword.face_dir * RUN_SPEED_PPS * game_framework.frame_time
+        if self.Sword.left_pressed and self.Sword.right_pressed:
+            pass
+        elif self.Sword.left_pressed:
+            self.Sword.face_dir = -1
+            self.Sword.x += -RUN_SPEED_PPS * game_framework.frame_time
+        elif self.Sword.right_pressed:
+            self.Sword.face_dir = 1
+            self.Sword.x += RUN_SPEED_PPS * game_framework.frame_time
 
     def draw(self):
         draw_rectangle(*self.get_bb())
@@ -288,7 +295,6 @@ class Idle:
 class Jump:
     def __init__(self,Sword):
         self.Sword = Sword
-        self.move = False
 
     def get_bb(self):
         return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
@@ -297,21 +303,21 @@ class Jump:
         if up_down(e) and self.Sword.on_ground:
             self.Sword.velocity_y = self.Sword.jump_speed
             self.Sword.on_ground = False
-        elif left_down(e):
-            self.Sword.face_dir = -1
-            self.move = True
-        elif right_down(e):
-            self.Sword.face_dir = 1
-            self.move = True
-        elif left_up(e) or right_up(e):
-            self.move = False
 
     def exit(self,e):
-        pass
+        self.Sword.velocity_x = 0
     def do(self):
-        if self.move:
-            self.Sword.x += self.Sword.face_dir * RUN_SPEED_PPS * game_framework.frame_time
         self.Sword.frame = (self.Sword.frame + 6 * ACTION_PER_TIME * game_framework.frame_time) % 6
+
+        if self.Sword.left_pressed and self.Sword.right_pressed:
+            pass
+        elif self.Sword.left_pressed:
+            self.Sword.face_dir = -1
+            self.Sword.x += -RUN_SPEED_PPS * game_framework.frame_time
+        elif self.Sword.right_pressed:
+            self.Sword.face_dir = 1
+            self.Sword.x += RUN_SPEED_PPS * game_framework.frame_time
+
     def draw(self):
         if self.Sword.face_dir == 1:
             self.Sword.image_air.clip_draw(int(self.Sword.frame) * 96, 84, 96, 84, self.Sword.x, self.Sword.y, 200,
@@ -363,7 +369,7 @@ class Sword:
             self.IDLE,
             {
                 self.IDLE: {left_down : self.RUN, right_down : self.RUN,space_down : self.IDLE, up_down : self.JUMP},
-                self.RUN: {left_up : self.IDLE, right_up : self.IDLE, right_down : self.IDLE, left_down : self.IDLE,space_down : self.RUN, up_down : self.JUMP},
+                self.RUN: {space_down : self.RUN, up_down : self.JUMP},
                 self.JUMP: {right_down : self.JUMP, left_down : self.JUMP, left_up : self.JUMP, right_up : self.JUMP}
             }
         )
@@ -379,6 +385,16 @@ class Sword:
         self.velocity_y -= self.gravity * game_framework.frame_time
         self.y += self.velocity_y * game_framework.frame_time
 
+        if isinstance(self.state_machine.cur_state, Jump):
+            if self.left_pressed:
+                self.velocity_x = -RUN_SPEED_PPS
+                self.face_dir = -1
+            elif self.right_pressed:
+                self.velocity_x = RUN_SPEED_PPS
+                self.face_dir = 1
+            else:
+                self.velocity_x = 0
+
         # 좌우 이동
         if self.velocity_x != 0:
             self.x += self.velocity_x * game_framework.frame_time
@@ -391,20 +407,42 @@ class Sword:
     def handle_event(self, event):
         if self.player_id == 1:
             if event.type == SDL_KEYDOWN:
-                if event.key not in (SDLK_a, SDLK_d, SDLK_SPACE, SDLK_w):
+                if event.key == SDLK_a:
+                    self.left_pressed = True
+                elif event.key == SDLK_d:
+                    self.right_pressed = True
+                elif event.key not in (SDLK_SPACE, SDLK_w):
                     return
             elif event.type == SDL_KEYUP:
-                if event.key not in (SDLK_a, SDLK_d):
+                if event.key == SDLK_a:
+                    self.left_pressed = False
+                elif event.key == SDLK_d:
+                    self.right_pressed = False
+                elif event.key not in (SDLK_a, SDLK_d):
                     return
         else:
             if event.type == SDL_KEYDOWN:
-                if event.key not in (SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_RETURN):
+                if event.key == SDLK_LEFT:
+                    self.left_pressed = True
+                elif event.key == SDLK_RIGHT:
+                    self.right_pressed = True
+                elif event.key not in (SDLK_UP, SDLK_RETURN):
                     return
             elif event.type == SDL_KEYUP:
-                if event.key not in (SDLK_LEFT, SDLK_RIGHT):
+                if event.key == SDLK_LEFT:
+                    self.left_pressed = False
+                elif event.key == SDLK_RIGHT:
+                    self.right_pressed = False
+                elif event.key not in (SDLK_LEFT, SDLK_RIGHT):
                     return
+        if isinstance(self.state_machine.cur_state, Run):
+            if not self.left_pressed and not self.right_pressed:
+                self.state_machine.cur_state.exit(('INPUT', event))
+                self.state_machine.cur_state = self.IDLE
+                self.state_machine.cur_state.enter(('INPUT', event))
+                return
+
         self.state_machine.handle_state_event(('INPUT', event))
-        pass
 
     def draw(self):
         self.state_machine.draw()
