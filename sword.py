@@ -288,6 +288,7 @@ class Idle:
 class Jump:
     def __init__(self,Sword):
         self.Sword = Sword
+        self.move = False
 
     def get_bb(self):
         return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
@@ -298,10 +299,18 @@ class Jump:
             self.Sword.on_ground = False
         elif left_down(e):
             self.Sword.face_dir = -1
+            self.move = True
+        elif right_down(e):
+            self.Sword.face_dir = 1
+            self.move = True
+        elif left_up(e) or right_up(e):
+            self.move = False
 
     def exit(self,e):
         pass
     def do(self):
+        if self.move:
+            self.Sword.x += self.Sword.face_dir * RUN_SPEED_PPS * game_framework.frame_time
         self.Sword.frame = (self.Sword.frame + 6 * ACTION_PER_TIME * game_framework.frame_time) % 6
     def draw(self):
         if self.Sword.face_dir == 1:
@@ -352,7 +361,7 @@ class Sword:
             {
                 self.IDLE: {left_down : self.RUN, right_down : self.RUN,space_down : self.IDLE, up_down : self.JUMP},
                 self.RUN: {left_up : self.IDLE, right_up : self.IDLE, right_down : self.IDLE, left_down : self.IDLE,space_down : self.RUN, up_down : self.JUMP},
-                self.JUMP: {right_down : self.JUMP, left_down : self.JUMP}
+                self.JUMP: {right_down : self.JUMP, left_down : self.JUMP, left_up : self.JUMP, right_up : self.JUMP}
             }
         )
 
