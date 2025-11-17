@@ -352,6 +352,9 @@ class Sword:
         self.jump_speed = 400
         self.on_ground = False
 
+        self.left_pressed = False
+        self.right_pressed = False
+
         self.IDLE = Idle(self)
         self.RUN = Run(self)
         self.JUMP = Jump(self)
