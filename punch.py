@@ -54,6 +54,8 @@ FRAMES_PER_ACTION = 8
 class Run:
     def __init__(self, Punch):
         self.Punch = Punch
+        self.atk = False
+        self.atk_timer = 0
 
     def get_bb(self):
         if self.Punch.face_dir == 1:
@@ -68,19 +70,39 @@ class Run:
             self.Punch.face_dir = 1
         elif left_down(e):
             self.Punch.face_dir = -1
+        elif space_down(e):
+            self.atk = True
+            self.atk_timer = 0
+            self.Punch.frame = 0
 
     def exit(self, e):
-        pass
+        self.atk = False
+        self.atk_timer = 0
 
     def do(self):
-        self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        if self.atk:
+            self.atk_timer += game_framework.frame_time
+            if self.atk_timer >= 0.3:
+                self.atk = False
+                self.atk_timer = 0
+                self.Punch.frame = 0
+            else:
+                self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 1
+        else:
+            self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
 
     def draw(self):
         draw_rectangle(*self.get_bb())
-        if self.Punch.face_dir == 1:
-            self.Punch.image_run.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200, 200)
+        if self.atk == False:
+            if self.Punch.face_dir == 1:
+                self.Punch.image_run.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200, 200)
+            else:
+                self.Punch.image_run.clip_composite_draw(int(self.Punch.frame) * 96, 0, 96, 84, 0, 'h', self.Punch.x, self.Punch.y, 200, 200)
         else:
-            self.Punch.image_run.clip_composite_draw(int(self.Punch.frame) * 96, 0, 96, 84, 0, 'h', self.Punch.x, self.Punch.y, 200, 200)
+            if self.Punch.face_dir == 1:
+                self.Punch.image_slide.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200, 200)
+            else:
+                self.Punch.image_slide.clip_composite_draw(int(self.Punch.frame) * 96, 0, 96, 84, 0, 'h', self.Punch.x, self.Punch.y, 200, 200)
 
 class Idle:
     def __init__(self, Punch):
@@ -261,6 +283,7 @@ class Punch:
     image_idle = None
     image_run = None
     image_jump = None
+    image_slide = None
 
     def __init__(self, player_id=1, start_x=100, start_y=180):
         if Punch.image_ia1 == None:
@@ -275,6 +298,8 @@ class Punch:
             Punch.image_run = load_image('Run.png')
         if Punch.image_jump == None:
             Punch.image_jump = load_image('Jump01-sheet.png')
+        if Punch.image_slide == None:
+            Punch.image_slide = load_image('Slide04.png')
 
         self.player_id = player_id
         self.x, self.y = start_x, start_y
