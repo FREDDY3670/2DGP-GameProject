@@ -92,6 +92,8 @@ class Run:
         return None
 
     def enter(self, e):
+        if e is None:
+            return
         if right_down(e):
             self.Sword.face_dir = 1
         elif left_down(e):
@@ -112,14 +114,6 @@ class Run:
                 self.Sword.frame = 0
         else:
             self.Sword.frame = (self.Sword.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
-        if self.Sword.left_pressed and self.Sword.right_pressed:
-            pass
-        elif self.Sword.left_pressed:
-            self.Sword.face_dir = -1
-            self.Sword.x += -RUN_SPEED_PPS * game_framework.frame_time
-        elif self.Sword.right_pressed:
-            self.Sword.face_dir = 1
-            self.Sword.x += RUN_SPEED_PPS * game_framework.frame_time
 
     def draw(self):
         draw_rectangle(*self.get_bb())
@@ -151,7 +145,7 @@ class Idle:
         self.row = 0
 
     def enter(self, e):
-        if space_down(e):
+        if e and space_down(e):
             self.atk = True
             self.atk_count += 1
             self.combo_timer = 0
@@ -306,10 +300,14 @@ class Jump:
             return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 40, self.Sword.y
 
     def get_weapon_bb(self):
-        pass
+        frame = int(self.Sword.frame)
+        if frame == 3:
+            return self.Sword.x - 80, self.Sword.y - 100, self.Sword.x + 35, self.Sword.y + 70
+        else:
+            return None
 
     def enter(self, e):
-        if up_down(e) and self.Sword.on_ground:
+        if e and up_down(e) and self.Sword.on_ground:
             self.Sword.velocity_y = self.Sword.jump_speed
             self.Sword.on_ground = False
 
@@ -318,17 +316,11 @@ class Jump:
     def do(self):
         self.Sword.frame = (self.Sword.frame + 6 * ACTION_PER_TIME * game_framework.frame_time) % 6
 
-        if self.Sword.left_pressed and self.Sword.right_pressed:
-            pass
-        elif self.Sword.left_pressed:
-            self.Sword.face_dir = -1
-            self.Sword.x += -RUN_SPEED_PPS * game_framework.frame_time
-        elif self.Sword.right_pressed:
-            self.Sword.face_dir = 1
-            self.Sword.x += RUN_SPEED_PPS * game_framework.frame_time
-
     def draw(self):
         draw_rectangle(*self.get_bb())
+        weapon_bb = self.get_weapon_bb()
+        if weapon_bb:
+            draw_rectangle(*weapon_bb)
         if self.Sword.face_dir == 1:
             self.Sword.image_air.clip_draw(int(self.Sword.frame) * 96, 84, 96, 84, self.Sword.x, self.Sword.y, 200,
                                            200)
@@ -388,13 +380,12 @@ class Sword:
         self.prev_x = self.x
         self.prev_y = self.y
 
-        # 타일과의 충돌 체크 전까지 공중에 있는 것으로 가정
         self.on_ground = False
 
-        # 중력 적용
         self.velocity_y -= self.gravity * game_framework.frame_time
         self.y += self.velocity_y * game_framework.frame_time
 
+        # 상태별 이동 처리
         if isinstance(self.state_machine.cur_state, Jump):
             if self.left_pressed:
                 self.velocity_x = -RUN_SPEED_PPS
@@ -404,13 +395,21 @@ class Sword:
                 self.face_dir = 1
             else:
                 self.velocity_x = 0
-        elif isinstance(self.state_machine.cur_state, Idle):
+        elif isinstance(self.state_machine.cur_state, Run):
+            if self.left_pressed and self.right_pressed:
+                self.velocity_x = 0
+            elif self.left_pressed:
+                self.velocity_x = -RUN_SPEED_PPS
+                self.face_dir = -1
+            elif self.right_pressed:
+                self.velocity_x = RUN_SPEED_PPS
+                self.face_dir = 1
+            else:
+                self.velocity_x = 0
+        else:  # Idle
             self.velocity_x = 0
 
-        # 좌우 이동
-        if self.velocity_x != 0:
-            self.x += self.velocity_x * game_framework.frame_time
-
+        self.x += self.velocity_x * game_framework.frame_time
         self.state_machine.update()
 
     def get_bb(self):
@@ -483,10 +482,12 @@ class Sword:
                     self.velocity_y = 0
                     self.on_ground = True
                     if isinstance(self.state_machine.cur_state, Jump):
+                        self.state_machine.cur_state.exit(None)
                         if self.left_pressed or self.right_pressed:
                             self.state_machine.cur_state = self.RUN
                         else:
                             self.state_machine.cur_state = self.IDLE
+                        self.state_machine.cur_state.enter(None)
                     return
                 if was_below and self.velocity_y > 0:
                     self.y = tile_bottom
