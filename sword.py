@@ -297,7 +297,13 @@ class Jump:
         self.Sword = Sword
 
     def get_bb(self):
-        return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
+        frame = int(self.Sword.frame)
+        if frame == 0 or frame == 1:
+            return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
+        elif frame == 2 or frame == 3:
+            return self.Sword.x - 40, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
+        else:
+            return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 40, self.Sword.y
 
     def enter(self, e):
         if up_down(e) and self.Sword.on_ground:
@@ -319,6 +325,7 @@ class Jump:
             self.Sword.x += RUN_SPEED_PPS * game_framework.frame_time
 
     def draw(self):
+        draw_rectangle(*self.get_bb())
         if self.Sword.face_dir == 1:
             self.Sword.image_air.clip_draw(int(self.Sword.frame) * 96, 84, 96, 84, self.Sword.x, self.Sword.y, 200,
                                            200)
