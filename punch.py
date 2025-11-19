@@ -56,12 +56,21 @@ class Run:
         self.Punch = Punch
         self.atk = False
         self.atk_timer = 0
+        self.slide_speed = 0
+        self.INITIAL_SLIDE_SPEED = 800.0
+        self.SLIDE_FRICTION = 400.0
 
     def get_bb(self):
-        if self.Punch.face_dir == 1:
-            return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 25, self.Punch.y - 10
+        if self.atk == False:
+            if self.Punch.face_dir == 1:
+                return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 25, self.Punch.y - 10
+            else:
+                return self.Punch.x - 25, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y - 10
         else:
-            return self.Punch.x - 25, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y - 10
+            if self.Punch.face_dir == 1:
+                return self.Punch.x - 45, self.Punch.y - 100, self.Punch.x + 50, self.Punch.y - 40
+            else:
+                return self.Punch.x - 50, self.Punch.y - 100, self.Punch.x + 45, self.Punch.y - 40
 
     def enter(self, e):
         if e is None:
@@ -73,16 +82,23 @@ class Run:
         elif space_down(e):
             self.atk = True
             self.atk_timer = 0
+            self.slide_speed = self.INITIAL_SLIDE_SPEED
             self.Punch.frame = 0
 
     def exit(self, e):
         self.atk = False
         self.atk_timer = 0
+        self.slide_speed = 0
 
     def do(self):
         if self.atk:
             self.atk_timer += game_framework.frame_time
-            if self.atk_timer >= 0.3:
+            self.slide_speed -= self.SLIDE_FRICTION * game_framework.frame_time
+            if self.slide_speed < 0:
+                self.slide_speed = 0
+
+            self.Punch.x += self.slide_speed * self.Punch.face_dir * game_framework.frame_time
+            if self.atk_timer >= 0.2:
                 self.atk = False
                 self.atk_timer = 0
                 self.Punch.frame = 0
@@ -351,20 +367,25 @@ class Punch:
             else:
                 self.velocity_x = 0
         elif isinstance(self.state_machine.cur_state, Run):
-            if self.left_pressed and self.right_pressed:
-                self.velocity_x = 0
-            elif self.left_pressed:
-                self.velocity_x = -RUN_SPEED_PPS
-                self.face_dir = -1
-            elif self.right_pressed:
-                self.velocity_x = RUN_SPEED_PPS
-                self.face_dir = 1
+            if not self.state_machine.cur_state.atk:
+                if self.left_pressed and self.right_pressed:
+                    self.velocity_x = 0
+                elif self.left_pressed:
+                    self.velocity_x = -RUN_SPEED_PPS
+                    self.face_dir = -1
+                elif self.right_pressed:
+                    self.velocity_x = RUN_SPEED_PPS
+                    self.face_dir = 1
+                else:
+                    self.velocity_x = 0
             else:
                 self.velocity_x = 0
         else:  # Idle
             self.velocity_x = 0
 
-        self.x += self.velocity_x * game_framework.frame_time
+        if not isinstance(self.state_machine.cur_state, Run) or not self.state_machine.cur_state.atk:
+            self.x += self.velocity_x * game_framework.frame_time
+
         self.state_machine.update()
 
     def handle_event(self, event):
