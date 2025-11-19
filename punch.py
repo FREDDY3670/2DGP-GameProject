@@ -245,7 +245,16 @@ class Punch:
         self.y += self.velocity_y * game_framework.frame_time
 
         # 상태별 이동 처리
-        if isinstance(self.state_machine.cur_state, Run):
+        if isinstance(self.state_machine.cur_state, Jump):
+            if self.left_pressed:
+                self.velocity_x = -RUN_SPEED_PPS
+                self.face_dir = -1
+            elif self.right_pressed:
+                self.velocity_x = RUN_SPEED_PPS
+                self.face_dir = 1
+            else:
+                self.velocity_x = 0
+        elif isinstance(self.state_machine.cur_state, Run):
             if self.left_pressed and self.right_pressed:
                 self.velocity_x = 0
             elif self.left_pressed:
