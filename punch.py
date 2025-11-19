@@ -166,6 +166,7 @@ class Punch:
     image_ia3 = None
     image_idle = None
     image_run = None
+    image_jump = None
 
     def __init__(self, player_id=1, start_x=100, start_y=180):
         if Punch.image_ia1 == None:
@@ -178,6 +179,8 @@ class Punch:
             Punch.image_idle = load_image('Idle01-sheet.png')
         if Punch.image_run == None:
             Punch.image_run = load_image('Run.png')
+        if Punch.image_jump == None:
+            Punch.image_jump = load_image('Jump01-sheet.png')
 
         self.player_id = player_id
         self.x, self.y = start_x, start_y
