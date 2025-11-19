@@ -421,6 +421,17 @@ class Punch:
         if not isinstance(self.state_machine.cur_state, Run) or not self.state_machine.cur_state.atk:
             self.x += self.velocity_x * game_framework.frame_time
 
+        punch_left, _, punch_right, _ = self.get_bb()
+        left_offset = self.x - punch_left
+        right_offset = punch_right - self.x
+
+        if punch_left < 0:
+            self.x = left_offset
+            self.velocity_x = 0
+        elif punch_right > 1600:
+            self.x = 1600 - right_offset
+            self.velocity_x = 0
+
         self.state_machine.update()
 
     def handle_event(self, event):

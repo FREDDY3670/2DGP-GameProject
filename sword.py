@@ -410,6 +410,16 @@ class Sword:
             self.velocity_x = 0
 
         self.x += self.velocity_x * game_framework.frame_time
+        sword_left, _, sword_right, _ = self.get_bb()
+        left_offset = self.x - sword_left
+        right_offset = sword_right - self.x
+
+        if sword_left < 0:
+            self.x = left_offset
+            self.velocity_x = 0
+        elif sword_right > 1600:
+            self.x = 1600 - right_offset
+            self.velocity_x = 0
         self.state_machine.update()
 
     def get_bb(self):
