@@ -223,13 +223,15 @@ class Punch:
 
         self.IDLE = Idle(self)
         self.RUN = Run(self)
+        self.JUMP = Jump(self)
 
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: {left_down: self.RUN, right_down: self.RUN, space_down: self.IDLE},
+                self.IDLE: {left_down: self.RUN, right_down: self.RUN, space_down: self.IDLE, up_down: self.JUMP},
                 self.RUN: {left_up: self.IDLE, right_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE,
-                           space_down: self.RUN}
+                           space_down: self.RUN, up_down: self.JUMP},
+                self.JUMP: {right_down: self.JUMP, left_down: self.JUMP, left_up: self.JUMP, right_up: self.JUMP}
             }
         )
 
