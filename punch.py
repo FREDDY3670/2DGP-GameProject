@@ -199,15 +199,15 @@ class Idle:
                         return self.Punch.x - 20, self.Punch.y - 100, self.Punch.x + 20, self.Punch.y - 10
 
     def enter(self, e):
-        if space_down(e):
+        if e and space_down(e):
             self.atk = True
             self.Punch.frame = 0
             self.atk_frame = 0
-        if self.atk_count == 3:
-            self.atk_count = 1
-        else:
-            self.atk_count += 1
-            self.combo_timer = 0
+            if self.atk_count == 3:
+                self.atk_count = 1
+            else:
+                self.atk_count += 1
+                self.combo_timer = 0
 
     def exit(self, e):
         pass
@@ -271,22 +271,49 @@ class Idle:
 class Jump:
     def __init__(self, Punch):
         self.Punch = Punch
+        self.atk = False
+        self.FAST_FALL_SPEED = -800
+        self.DASH_SPEED = 400
 
     def get_bb(self):
-        return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y
+        if self.Punch.frame == 0:
+            if self.Punch.face_dir == 1:
+                return self.Punch.x - 25, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y
+            else:
+                return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 25, self.Punch.y
+        elif self.Punch.frame == 1:
+            if self.Punch.face_dir == 1:
+                return self.Punch.x - 20, self.Punch.y - 80, self.Punch.x + 25, self.Punch.y - 10
+            else:
+                return self.Punch.x - 25, self.Punch.y - 80, self.Punch.x + 20, self.Punch.y - 10
+        else:
+            if self.Punch.face_dir == 1:
+                return self.Punch.x - 20, self.Punch.y - 110, self.Punch.x + 20, self.Punch.y - 20
+            else:
+                return self.Punch.x - 50, self.Punch.y - 110, self.Punch.x + 40, self.Punch.y - 40
 
     def enter(self, e):
         if e and up_down(e) and self.Punch.on_ground:
             self.Punch.velocity_y = self.Punch.jump_speed
             self.Punch.on_ground = False
+            self.atk = False
+        elif e and space_down(e) and not self.Punch.on_ground:
+            self.atk = True
 
     def exit(self, e):
         self.Punch.velocity_x = 0
+        self.atk = False
 
     def do(self):
-        self.Punch.frame = (self.Punch.frame + 3 * ACTION_PER_TIME * game_framework.frame_time) % 3
+        if self.Punch.velocity_y > 100:
+            self.Punch.frame = 0
+        elif self.atk:
+            self.Punch.frame = 2
+        else:
+            self.Punch.frame = 1
 
     def draw(self):
+        draw_rectangle(*self.get_bb())
         if self.Punch.face_dir == 1:
             self.Punch.image_jump.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200, 200)
         else:
@@ -343,7 +370,7 @@ class Punch:
                 self.IDLE: {left_down: self.RUN, right_down: self.RUN, space_down: self.IDLE, up_down: self.JUMP},
                 self.RUN: {left_up: self.IDLE, right_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE,
                            space_down: self.RUN, up_down: self.JUMP},
-                self.JUMP: {right_down: self.JUMP, left_down: self.JUMP, left_up: self.JUMP, right_up: self.JUMP}
+                self.JUMP: {right_down: self.JUMP, left_down: self.JUMP, left_up: self.JUMP, right_up: self.JUMP,space_down : self.JUMP}
             }
         )
 
@@ -354,11 +381,19 @@ class Punch:
         self.on_ground = False
 
         self.velocity_y -= self.gravity * game_framework.frame_time
+
+        if isinstance(self.state_machine.cur_state, Jump) and self.state_machine.cur_state.atk:
+            if self.velocity_y > self.state_machine.cur_state.FAST_FALL_SPEED:
+                self.velocity_y = self.state_machine.cur_state.FAST_FALL_SPEED
+
         self.y += self.velocity_y * game_framework.frame_time
 
         # 상태별 이동 처리
         if isinstance(self.state_machine.cur_state, Jump):
-            if self.left_pressed:
+            if self.state_machine.cur_state.atk:
+                # 점프 공격 시 전방 대시
+                self.velocity_x = self.state_machine.cur_state.DASH_SPEED * self.face_dir
+            elif self.left_pressed:
                 self.velocity_x = -RUN_SPEED_PPS
                 self.face_dir = -1
             elif self.right_pressed:
@@ -434,9 +469,11 @@ class Punch:
             punch_left, punch_bottom, punch_right, punch_top = self.get_bb()
             tile_left, tile_bottom, tile_right, tile_top = other.get_bb()
 
+            current_bottom_offset = self.y - punch_bottom
+            prev_bottom = self.prev_y - current_bottom_offset
+
             prev_left = self.prev_x - 30
             prev_right = self.prev_x + 30
-            prev_bottom = self.prev_y - 100
             prev_top = self.prev_y
 
             overlap_x = min(punch_right - tile_left, tile_right - punch_left)
@@ -449,7 +486,13 @@ class Punch:
 
             if overlap_y < overlap_x:
                 if was_above:
-                    self.y = tile_top + 100
+                    # 착지 후 상태 변경을 고려한 y 좌표 조정
+                    if isinstance(self.state_machine.cur_state, Jump):
+                        # Idle/Run 상태의 바운딩 박스 높이 (100)로 조정
+                        self.y = tile_top + 100
+                    else:
+                        self.y = tile_top + current_bottom_offset
+
                     self.velocity_y = 0
                     self.on_ground = True
                     if isinstance(self.state_machine.cur_state, Jump):
