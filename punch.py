@@ -335,6 +335,13 @@ class Punch:
                     self.y = tile_top + 100
                     self.velocity_y = 0
                     self.on_ground = True
+                    if isinstance(self.state_machine.cur_state, Jump):
+                        self.state_machine.cur_state.exit(None)
+                        if self.left_pressed or self.right_pressed:
+                            self.state_machine.cur_state = self.RUN
+                        else:
+                            self.state_machine.cur_state = self.IDLE
+                        self.state_machine.cur_state.enter(None)
                     return
                 if was_below and self.velocity_y > 0:
                     self.y = tile_bottom
@@ -351,6 +358,9 @@ class Punch:
                     self.x = tile_right + 30
                     self.velocity_x = 0
                     return
+
+    def get_bb(self):
+        return self.state_machine.cur_state.get_bb()
 
     def draw(self):
         self.state_machine.draw()
