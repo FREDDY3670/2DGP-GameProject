@@ -138,7 +138,6 @@ class Run:
         else:
             self.gun.frame = (self.gun.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
 
-        self.gun.x += self.gun.face_dir * RUN_SPEED_PPS * game_framework.frame_time
     def draw(self):
         draw_rectangle(*self.get_bb())
         if self.atk == False:
