@@ -305,6 +305,9 @@ class Jump:
         else:
             return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 40, self.Sword.y
 
+    def get_weapon_bb(self):
+        pass
+
     def enter(self, e):
         if up_down(e) and self.Sword.on_ground:
             self.Sword.velocity_y = self.Sword.jump_speed
