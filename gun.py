@@ -161,6 +161,7 @@ class Gun:
     image_ia = None
     image_ra = None
     bullet_image = None
+    image_jump = None
 
     def __init__(self, player_id=1, start_x=100, start_y=180):
         if Gun.image_idle == None:
@@ -173,6 +174,8 @@ class Gun:
             Gun.image_ra = load_image('GunRunFire01-sheet.png')
         if Gun.bullet_image == None:
             Gun.bullet_image = load_image('Bullet02.png')
+        if Gun.image_jump == None:
+            Gun.image_jump = load_image('FrontFlip01-sheet.png')
 
         self.player_id = player_id
         self.x, self.y = start_x, start_y
@@ -192,6 +195,7 @@ class Gun:
 
         self.IDLE = Idle(self)
         self.RUN = Run(self)
+        self.JUMP = Jump(self)
 
         self.state_machine = StateMachine(
             self.IDLE,
@@ -199,6 +203,7 @@ class Gun:
                 self.IDLE: {left_down: self.RUN, right_down: self.RUN, space_down: self.IDLE},
                 self.RUN: {left_up: self.IDLE, right_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE,
                            space_down: self.RUN}
+                self.JUMP: {right_down: self.JUMP, left_down: self.JUMP, left_up: self.JUMP, right_up: self.JUMP}
             }
         )
 
@@ -211,7 +216,6 @@ class Gun:
         self.velocity_y -= self.gravity * game_framework.frame_time
         self.y += self.velocity_y * game_framework.frame_time
 
-        # 상태별 이동 처리
         if isinstance(self.state_machine.cur_state, Run):
             if self.left_pressed and self.right_pressed:
                 self.velocity_x = 0
