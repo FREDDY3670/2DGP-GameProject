@@ -70,8 +70,11 @@ class Idle:
             return self.gun.x - 30, self.gun.y - 100, self.gun.x + 30, self.gun.y
         else:
             return self.gun.x - 35, self.gun.y - 100, self.gun.x + 35, self.gun.y
-    def enter(self,e):
+
+    def enter(self, e):
         self.gun.frame = 0
+        if e is None:
+            return
         if left_up(e):
             self.gun.face_dir = -1
         elif right_up(e):
@@ -105,16 +108,32 @@ class Idle:
                                                   200)
 
 class Jump:
-    def __init__(self,Gun):
+    def __init__(self, Gun):
         self.gun = Gun
-    def enter(self,e):
-        pass
-    def exit(self,e):
-        pass
+
+    def get_bb(self):
+        if self.gun.face_dir == 1:
+            return self.gun.x - 30, self.gun.y - 100, self.gun.x + 30, self.gun.y
+        else:
+            return self.gun.x - 30, self.gun.y - 100, self.gun.x + 30, self.gun.y
+
+    def enter(self, e):
+        if e and up_down(e) and self.gun.on_ground:
+            self.gun.velocity_y = self.gun.jump_speed
+            self.gun.on_ground = False
+
+    def exit(self, e):
+        self.gun.velocity_x = 0
+
     def do(self):
-        pass
+        self.gun.frame = (self.gun.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 14
+
     def draw(self):
-        pass
+        draw_rectangle(*self.get_bb())
+        if self.gun.face_dir == 1:
+            self.gun.image_jump.clip_draw(int(self.gun.frame) * 96, 0, 96, 84, self.gun.x, self.gun.y, 200, 200)
+        else:
+            self.gun.image_jump.clip_composite_draw(int(self.gun.frame) * 96, 0, 96, 84, 0, 'h', self.gun.x, self.gun.y, 200, 200)
 
 class Run:
     def __init__(self,Gun):
@@ -127,14 +146,16 @@ class Run:
             return self.gun.x - 40, self.gun.y - 100, self.gun.x + 50, self.gun.y
         else:
             return self.gun.x - 50, self.gun.y - 100, self.gun.x + 40, self.gun.y
-    def enter(self,e):
-        if left_down(e):
-            self.gun.face_dir = -1
-        elif right_down(e):
+
+    def enter(self, e):
+        if e is None:
+            return
+        if right_down(e):
             self.gun.face_dir = 1
+        elif left_down(e):
+            self.gun.face_dir = -1
         elif space_down(e):
             self.atk = True
-            self.gun.frame = 0
             self.gun.shoot()
     def exit(self,e):
         self.atk = False
@@ -209,9 +230,9 @@ class Gun:
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: {left_down: self.RUN, right_down: self.RUN, space_down: self.IDLE},
+                self.IDLE: {left_down: self.RUN, right_down: self.RUN, space_down: self.IDLE, up_down: self.JUMP},
                 self.RUN: {left_up: self.IDLE, right_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE,
-                           space_down: self.RUN}
+                           space_down: self.RUN, up_down: self.JUMP},
                 self.JUMP: {right_down: self.JUMP, left_down: self.JUMP, left_up: self.JUMP, right_up: self.JUMP}
             }
         )
@@ -225,7 +246,16 @@ class Gun:
         self.velocity_y -= self.gravity * game_framework.frame_time
         self.y += self.velocity_y * game_framework.frame_time
 
-        if isinstance(self.state_machine.cur_state, Run):
+        if isinstance(self.state_machine.cur_state, Jump):
+            if self.left_pressed:
+                self.velocity_x = -RUN_SPEED_PPS
+                self.face_dir = -1
+            elif self.right_pressed:
+                self.velocity_x = RUN_SPEED_PPS
+                self.face_dir = 1
+            else:
+                self.velocity_x = 0
+        elif isinstance(self.state_machine.cur_state, Run):
             if self.left_pressed and self.right_pressed:
                 self.velocity_x = 0
             elif self.left_pressed:
@@ -262,7 +292,7 @@ class Gun:
                     self.left_pressed = True
                 elif event.key == SDLK_d:
                     self.right_pressed = True
-                elif event.key != SDLK_SPACE:
+                elif event.key not in (SDLK_SPACE, SDLK_w):
                     return
             elif event.type == SDL_KEYUP:
                 if event.key == SDLK_a:
@@ -277,7 +307,7 @@ class Gun:
                     self.left_pressed = True
                 elif event.key == SDLK_RIGHT:
                     self.right_pressed = True
-                elif event.key != SDLK_RETURN:
+                elif event.key not in (SDLK_UP, SDLK_RETURN):
                     return
             elif event.type == SDL_KEYUP:
                 if event.key == SDLK_LEFT:
@@ -304,7 +334,6 @@ class Gun:
             gun_left, gun_bottom, gun_right, gun_top = self.get_bb()
             tile_left, tile_bottom, tile_right, tile_top = other.get_bb()
 
-            # 현재 바운딩 박스 기준으로 이전 위치의 바운딩 박스 계산
             current_left_offset = self.x - gun_left
             current_right_offset = gun_right - self.x
             current_bottom_offset = self.y - gun_bottom
@@ -324,9 +353,16 @@ class Gun:
 
             if overlap_y < overlap_x:
                 if was_above:
-                    self.y = tile_top + current_bottom_offset
+                    self.y = tile_top + 100  # Jump 클래스의 바운딩 박스 높이에 맞춤
                     self.velocity_y = 0
                     self.on_ground = True
+                    if isinstance(self.state_machine.cur_state, Jump):
+                        self.state_machine.cur_state.exit(None)
+                        if self.left_pressed or self.right_pressed:
+                            self.state_machine.cur_state = self.RUN
+                        else:
+                            self.state_machine.cur_state = self.IDLE
+                        self.state_machine.cur_state.enter(None)
                     return
                 if was_below and self.velocity_y > 0:
                     self.y = tile_bottom
