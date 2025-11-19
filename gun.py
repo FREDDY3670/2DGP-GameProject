@@ -95,6 +95,18 @@ class Idle:
                 self.gun.image_ia.clip_composite_draw(int(self.gun.frame) * 96, 0, 96, 84,0,'h', self.gun.x, self.gun.y, 200,
                                                   200)
 
+class Jump:
+    def __init__(self,Gun):
+        self.gun = Gun
+    def enter(self,e):
+        pass
+    def exit(self,e):
+        pass
+    def do(self):
+        pass
+    def draw(self):
+        pass
+
 class Run:
     def __init__(self,Gun):
         self.gun = Gun
