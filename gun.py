@@ -162,7 +162,8 @@ class Gun:
     image_ia = None
     image_ra = None
     bullet_image = None
-    def __init__(self, player_id = 1, start_x = 100, start_y = 180):
+
+    def __init__(self, player_id=1, start_x=100, start_y=180):
         if Gun.image_idle == None:
             Gun.image_idle = load_image('GunAim.png')
         if Gun.image_run == None:
@@ -173,10 +174,22 @@ class Gun:
             Gun.image_ra = load_image('GunRunFire01-sheet.png')
         if Gun.bullet_image == None:
             Gun.bullet_image = load_image('Bullet02.png')
+
         self.player_id = player_id
         self.x, self.y = start_x, start_y
         self.frame = 0
-        self.face_dir = 1
+        self.face_dir = 1 if player_id == 1 else -1
+        self.prev_x = start_x
+        self.prev_y = start_y
+
+        self.velocity_y = 0
+        self.velocity_x = 0
+        self.gravity = 980
+        self.jump_speed = 400
+        self.on_ground = False
+
+        self.left_pressed = False
+        self.right_pressed = False
 
         self.IDLE = Idle(self)
         self.RUN = Run(self)
@@ -184,31 +197,140 @@ class Gun:
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: {left_down : self.RUN, right_down : self.RUN,space_down : self.IDLE},
-                self.RUN: {space_down : self.RUN, left_up : self.IDLE, right_up : self.IDLE, right_down : self.IDLE, left_down : self.IDLE}
+                self.IDLE: {left_down: self.RUN, right_down: self.RUN, space_down: self.IDLE},
+                self.RUN: {left_up: self.IDLE, right_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE,
+                           space_down: self.RUN}
             }
         )
 
     def update(self):
+        self.prev_x = self.x
+        self.prev_y = self.y
+
+        self.on_ground = False
+
+        self.velocity_y -= self.gravity * game_framework.frame_time
+        self.y += self.velocity_y * game_framework.frame_time
+
+        # 상태별 이동 처리
+        if isinstance(self.state_machine.cur_state, Run):
+            if self.left_pressed and self.right_pressed:
+                self.velocity_x = 0
+            elif self.left_pressed:
+                self.velocity_x = -RUN_SPEED_PPS
+                self.face_dir = -1
+            elif self.right_pressed:
+                self.velocity_x = RUN_SPEED_PPS
+                self.face_dir = 1
+            else:
+                self.velocity_x = 0
+        else:  # Idle
+            self.velocity_x = 0
+
+        self.x += self.velocity_x * game_framework.frame_time
+
+        # 맵 경계 제한 (0 ~ 1600)
+        gun_left, _, gun_right, _ = self.get_bb()
+        left_offset = self.x - gun_left
+        right_offset = gun_right - self.x
+
+        if gun_left < 0:
+            self.x = left_offset
+            self.velocity_x = 0
+        elif gun_right > 1600:
+            self.x = 1600 - right_offset
+            self.velocity_x = 0
+
         self.state_machine.update()
 
     def handle_event(self, event):
         if self.player_id == 1:
             if event.type == SDL_KEYDOWN:
-                if event.key not in (SDLK_a, SDLK_d, SDLK_SPACE):
+                if event.key == SDLK_a:
+                    self.left_pressed = True
+                elif event.key == SDLK_d:
+                    self.right_pressed = True
+                elif event.key != SDLK_SPACE:
                     return
             elif event.type == SDL_KEYUP:
-                if event.key not in (SDLK_a, SDLK_d):
+                if event.key == SDLK_a:
+                    self.left_pressed = False
+                elif event.key == SDLK_d:
+                    self.right_pressed = False
+                elif event.key not in (SDLK_a, SDLK_d):
                     return
         else:
             if event.type == SDL_KEYDOWN:
-                if event.key not in (SDLK_LEFT, SDLK_RIGHT, SDLK_RETURN):
+                if event.key == SDLK_LEFT:
+                    self.left_pressed = True
+                elif event.key == SDLK_RIGHT:
+                    self.right_pressed = True
+                elif event.key != SDLK_RETURN:
                     return
             elif event.type == SDL_KEYUP:
-                if event.key not in (SDLK_LEFT, SDLK_RIGHT):
+                if event.key == SDLK_LEFT:
+                    self.left_pressed = False
+                elif event.key == SDLK_RIGHT:
+                    self.right_pressed = False
+                elif event.key not in (SDLK_LEFT, SDLK_RIGHT):
                     return
+
+        if isinstance(self.state_machine.cur_state, Run):
+            if not self.left_pressed and not self.right_pressed:
+                self.state_machine.cur_state.exit(('INPUT', event))
+                self.state_machine.cur_state = self.IDLE
+                self.state_machine.cur_state.enter(('INPUT', event))
+                return
+
         self.state_machine.handle_state_event(('INPUT', event))
-        pass
+
+    def get_bb(self):
+        return self.state_machine.cur_state.get_bb()
+
+    def handle_collision(self, group, other):
+        if group == 'player:tile':
+            gun_left, gun_bottom, gun_right, gun_top = self.get_bb()
+            tile_left, tile_bottom, tile_right, tile_top = other.get_bb()
+
+            # 현재 바운딩 박스 기준으로 이전 위치의 바운딩 박스 계산
+            current_left_offset = self.x - gun_left
+            current_right_offset = gun_right - self.x
+            current_bottom_offset = self.y - gun_bottom
+
+            prev_left = self.prev_x - current_left_offset
+            prev_right = self.prev_x + current_right_offset
+            prev_bottom = self.prev_y - current_bottom_offset
+            prev_top = self.prev_y
+
+            overlap_x = min(gun_right - tile_left, tile_right - gun_left)
+            overlap_y = min(gun_top - tile_bottom, tile_top - gun_bottom)
+
+            was_above = prev_bottom >= tile_top
+            was_below = prev_top <= tile_bottom
+            was_left = prev_right <= tile_left
+            was_right = prev_left >= tile_right
+
+            if overlap_y < overlap_x:
+                if was_above:
+                    self.y = tile_top + current_bottom_offset
+                    self.velocity_y = 0
+                    self.on_ground = True
+                    return
+                if was_below and self.velocity_y > 0:
+                    self.y = tile_bottom
+                    self.velocity_y = 0
+                    return
+
+            else:
+                if was_left:
+                    self.x = tile_left - current_right_offset
+                    self.velocity_x = 0
+                    return
+
+                if was_right:
+                    self.x = tile_right + current_left_offset
+                    self.velocity_x = 0
+                    return
 
     def draw(self):
         self.state_machine.draw()
