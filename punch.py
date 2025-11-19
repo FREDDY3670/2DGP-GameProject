@@ -71,6 +71,14 @@ class Run:
                 return self.Punch.x - 45, self.Punch.y - 100, self.Punch.x + 50, self.Punch.y - 40
             else:
                 return self.Punch.x - 50, self.Punch.y - 100, self.Punch.x + 45, self.Punch.y - 40
+    def get_weapon_bb(self):
+        if self.atk:
+            if self.Punch.face_dir == 1:
+                return self.Punch.x, self.Punch.y - 100, self.Punch.x + 50, self.Punch.y - 80
+            else:
+                return self.Punch.x - 50, self.Punch.y - 100, self.Punch.x, self.Punch.y - 80
+        else:
+            return None
 
     def enter(self, e):
         if e is None:
@@ -109,6 +117,9 @@ class Run:
 
     def draw(self):
         draw_rectangle(*self.get_bb())
+        weapon = self.get_weapon_bb()
+        if weapon:
+            draw_rectangle(*weapon)
         if self.atk == False:
             if self.Punch.face_dir == 1:
                 self.Punch.image_run.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200, 200)
