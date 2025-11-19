@@ -469,11 +469,14 @@ class Punch:
             punch_left, punch_bottom, punch_right, punch_top = self.get_bb()
             tile_left, tile_bottom, tile_right, tile_top = other.get_bb()
 
+            # 현재 바운딩 박스 기준으로 이전 위치의 바운딩 박스 계산
+            current_left_offset = self.x - punch_left
+            current_right_offset = punch_right - self.x
             current_bottom_offset = self.y - punch_bottom
-            prev_bottom = self.prev_y - current_bottom_offset
 
-            prev_left = self.prev_x - 30
-            prev_right = self.prev_x + 30
+            prev_left = self.prev_x - current_left_offset
+            prev_right = self.prev_x + current_right_offset
+            prev_bottom = self.prev_y - current_bottom_offset
             prev_top = self.prev_y
 
             overlap_x = min(punch_right - tile_left, tile_right - punch_left)
@@ -486,9 +489,7 @@ class Punch:
 
             if overlap_y < overlap_x:
                 if was_above:
-                    # 착지 후 상태 변경을 고려한 y 좌표 조정
                     if isinstance(self.state_machine.cur_state, Jump):
-                        # Idle/Run 상태의 바운딩 박스 높이 (100)로 조정
                         self.y = tile_top + 100
                     else:
                         self.y = tile_top + current_bottom_offset
@@ -510,12 +511,12 @@ class Punch:
 
             else:
                 if was_left:
-                    self.x = tile_left - 30
+                    self.x = tile_left - current_right_offset
                     self.velocity_x = 0
                     return
 
                 if was_right:
-                    self.x = tile_right + 30
+                    self.x = tile_right + current_left_offset
                     self.velocity_x = 0
                     return
 
