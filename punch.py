@@ -1,4 +1,4 @@
-from pico2d import load_image
+from pico2d import load_image, draw_rectangle
 from sdl2 import SDLK_SPACE, SDL_KEYDOWN, SDLK_RETURN, SDLK_a, SDLK_LEFT, SDLK_RIGHT, SDLK_d, SDLK_w, SDLK_UP, \
     SDL_KEYUP, SDLK_DOWN, SDLK_s
 
@@ -56,7 +56,10 @@ class Run:
         self.Punch = Punch
 
     def get_bb(self):
-        return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y
+        if self.Punch.face_dir == 1:
+            return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 25, self.Punch.y - 10
+        else:
+            return self.Punch.x - 25, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y - 10
 
     def enter(self, e):
         if e is None:
@@ -73,6 +76,7 @@ class Run:
         self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
 
     def draw(self):
+        draw_rectangle(*self.get_bb())
         if self.Punch.face_dir == 1:
             self.Punch.image_run.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200, 200)
         else:
@@ -88,7 +92,73 @@ class Idle:
         self.atk_frame = 0
 
     def get_bb(self):
-        return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y
+        frame = int(self.Punch.frame)
+        if self.Punch.face_dir == 1:
+            if self.atk == False:
+                return self.Punch.x - 20, self.Punch.y - 100, self.Punch.x + 20, self.Punch.y - 5
+            else:
+                if self.atk_count == 1:
+                    if frame == 0:
+                        return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 25, self.Punch.y - 7
+                    elif frame == 1:
+                        return self.Punch.x - 35, self.Punch.y - 100, self.Punch.x + 25, self.Punch.y - 5
+                    elif frame == 2:
+                        return self.Punch.x - 20, self.Punch.y - 100, self.Punch.x + 70, self.Punch.y - 20
+                    else:
+                        return self.Punch.x - 15, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y - 10
+                elif self.atk_count == 2:
+                    if frame == 0:
+                        return self.Punch.x - 35, self.Punch.y - 100, self.Punch.x + 20, self.Punch.y - 10
+                    elif frame == 1 or frame == 2:
+                        return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 50, self.Punch.y - 10
+                    else:
+                        return self.Punch.x - 25, self.Punch.y - 100, self.Punch.x + 20, self.Punch.y - 5
+                else:
+                    if frame == 0:
+                        return self.Punch.x - 40, self.Punch.y - 100, self.Punch.x + 20, self.Punch.y
+                    elif frame == 1:
+                        return self.Punch.x - 35, self.Punch.y - 100, self.Punch.x + 15, self.Punch.y + 10
+                    elif frame == 2:
+                        return self.Punch.x - 32, self.Punch.y - 100, self.Punch.x + 45, self.Punch.y + 12
+                    elif frame == 3 or frame == 4:
+                        return self.Punch.x - 25, self.Punch.y - 100, self.Punch.x + 40, self.Punch.y + 10
+                    elif frame == 5:
+                        return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 40, self.Punch.y - 7
+                    elif frame == 6:
+                        return self.Punch.x - 20, self.Punch.y - 100, self.Punch.x + 20, self.Punch.y - 10
+        else:
+            if self.atk == False:
+                return self.Punch.x - 20, self.Punch.y - 100, self.Punch.x + 20, self.Punch.y - 5
+            else:
+                if self.atk_count == 1:
+                    if frame == 0:
+                        return self.Punch.x - 25, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y - 7
+                    elif frame == 1:
+                        return self.Punch.x - 25, self.Punch.y - 100, self.Punch.x + 35, self.Punch.y - 5
+                    elif frame == 2:
+                        return self.Punch.x - 70, self.Punch.y - 100, self.Punch.x + 20, self.Punch.y - 20
+                    else:
+                        return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 15, self.Punch.y - 10
+                elif self.atk_count == 2:
+                    if frame == 0:
+                        return self.Punch.x - 20, self.Punch.y - 100, self.Punch.x + 35, self.Punch.y - 10
+                    elif frame == 1 or frame == 2:
+                        return self.Punch.x - 50, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y - 10
+                    else:
+                        return self.Punch.x - 20, self.Punch.y - 100, self.Punch.x + 25, self.Punch.y - 5
+                else:
+                    if frame == 0:
+                        return self.Punch.x - 20, self.Punch.y - 100, self.Punch.x + 40, self.Punch.y
+                    elif frame == 1:
+                        return self.Punch.x - 15, self.Punch.y - 100, self.Punch.x + 35, self.Punch.y + 10
+                    elif frame == 2:
+                        return self.Punch.x - 45, self.Punch.y - 100, self.Punch.x + 32, self.Punch.y + 12
+                    elif frame == 3 or frame == 4:
+                        return self.Punch.x - 40, self.Punch.y - 100, self.Punch.x + 25, self.Punch.y + 10
+                    elif frame == 5:
+                        return self.Punch.x - 40, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y - 7
+                    elif frame == 6:
+                        return self.Punch.x - 20, self.Punch.y - 100, self.Punch.x + 20, self.Punch.y - 10
 
     def enter(self, e):
         if space_down(e):
@@ -131,6 +201,7 @@ class Idle:
                 self.Punch.frame = 0
 
     def draw(self):
+        draw_rectangle(*self.get_bb())
         if self.atk == False:
             if self.Punch.face_dir == 1:
                 self.Punch.image_idle.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,
