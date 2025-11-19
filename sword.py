@@ -394,6 +394,8 @@ class Sword:
                 self.face_dir = 1
             else:
                 self.velocity_x = 0
+        elif isinstance(self.state_machine.cur_state, Idle):
+            self.velocity_x = 0
 
         # 좌우 이동
         if self.velocity_x != 0:
@@ -471,9 +473,11 @@ class Sword:
                     self.velocity_y = 0
                     self.on_ground = True
                     if isinstance(self.state_machine.cur_state, Jump):
-                        self.state_machine.cur_state = self.IDLE
+                        if self.left_pressed or self.right_pressed:
+                            self.state_machine.cur_state = self.RUN
+                        else:
+                            self.state_machine.cur_state = self.IDLE
                     return
-
                 if was_below and self.velocity_y > 0:
                     self.y = tile_bottom
                     self.velocity_y = 0
