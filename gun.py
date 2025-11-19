@@ -1,9 +1,17 @@
 from pico2d import load_image, draw_rectangle
-from sdl2 import SDL_KEYDOWN, SDLK_LEFT, SDLK_RIGHT, SDL_KEYUP, SDLK_SPACE, SDLK_a, SDLK_d, SDLK_RETURN
+from sdl2 import SDL_KEYDOWN, SDLK_LEFT, SDLK_RIGHT, SDL_KEYUP, SDLK_SPACE, SDLK_a, SDLK_d, SDLK_RETURN, SDLK_w, SDLK_UP
 
 import game_framework
 from state_machine import StateMachine
 import game_world
+
+def up_down(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
+            (e[1].key == SDLK_w or e[1].key == SDLK_UP))
+
+def up_up(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
+            (e[1].key == SDLK_w or e[1].key == SDLK_UP))
 
 def space_down(e):
     return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and
@@ -24,6 +32,7 @@ def right_up(e):
 def left_up(e):
     return (e[0] == 'INPUT' and e[1].type == SDL_KEYUP and
             (e[1].key == SDLK_LEFT or e[1].key == SDLK_a))
+
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
 RUN_SPEED_KMPH = 40.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
