@@ -167,16 +167,21 @@ class Jump:
         return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y
 
     def enter(self, e):
-        pass
+        if e and up_down(e) and self.Punch.on_ground:
+            self.Punch.velocity_y = self.Punch.jump_speed
+            self.Punch.on_ground = False
 
     def exit(self, e):
-        pass
+        self.Punch.velocity_x = 0
 
     def do(self):
-        pass
+        self.Punch.frame = (self.Punch.frame + 3 * ACTION_PER_TIME * game_framework.frame_time) % 3
 
     def draw(self):
-        pass
+        if self.Punch.face_dir == 1:
+            self.Punch.image_jump.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200, 200)
+        else:
+            self.Punch.image_jump.clip_composite_draw(int(self.Punch.frame) * 96, 0, 96, 84, 0, 'h', self.Punch.x, self.Punch.y, 200, 200)
 
 class Punch:
     image_ia1 = None
