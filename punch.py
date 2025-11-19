@@ -278,7 +278,7 @@ class Punch:
                     self.left_pressed = True
                 elif event.key == SDLK_d:
                     self.right_pressed = True
-                elif event.key not in (SDLK_SPACE,):
+                elif event.key not in (SDLK_SPACE, SDLK_w):
                     return
             elif event.type == SDL_KEYUP:
                 if event.key == SDLK_a:
@@ -293,7 +293,7 @@ class Punch:
                     self.left_pressed = True
                 elif event.key == SDLK_RIGHT:
                     self.right_pressed = True
-                elif event.key not in (SDLK_RETURN,):
+                elif event.key not in (SDLK_RETURN, SDLK_UP):
                     return
             elif event.type == SDL_KEYUP:
                 if event.key == SDLK_LEFT:
