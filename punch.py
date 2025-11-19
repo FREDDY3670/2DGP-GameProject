@@ -159,6 +159,24 @@ class Idle:
                 elif self.atk_count == 3:
                     self.Punch.image_ia3.clip_composite_draw(int(self.Punch.frame) * 96, 0, 96, 84, 0, 'h', self.Punch.x, self.Punch.y, 200, 200)
 
+class Jump:
+    def __init__(self, Punch):
+        self.Punch = Punch
+
+    def get_bb(self):
+        return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y
+
+    def enter(self, e):
+        pass
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        pass
+
+    def draw(self):
+        pass
 
 class Punch:
     image_ia1 = None
