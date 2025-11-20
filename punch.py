@@ -365,7 +365,7 @@ class Punch:
         self.velocity_y = 0
         self.velocity_x = 0
         self.gravity = 980
-        self.jump_speed = 400
+        self.jump_speed = 450
         self.on_ground = False
 
         self.left_pressed = False
