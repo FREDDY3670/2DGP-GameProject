@@ -1,3 +1,4 @@
+import random
 from pico2d import *
 from map import Map
 import game_framework
@@ -8,7 +9,7 @@ from sword import Sword
 from tile import Tile
 import select_weapon
 
-select_map = 0
+select_map = random.randint(0, 4)
 
 def handle_events():
     event_list = get_events()
@@ -29,7 +30,7 @@ def init():
     p2_w = select_weapon.player2_weapon
     print(p1_w, p2_w)
 
-    map = Map()
+    map = Map(select_map)
     game_world.add_object(map, 0)
 
     player1 = None
