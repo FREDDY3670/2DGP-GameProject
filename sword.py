@@ -145,7 +145,7 @@ class Idle:
         self.row = 0
 
     def enter(self, e):
-        if e and space_down(e):
+        if e and space_down(e) and not self.atk:
             self.atk = True
             self.atk_count += 1
             if self.atk_count > 3:
