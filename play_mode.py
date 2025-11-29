@@ -66,6 +66,9 @@ def init():
     game_world.add_collision_pair('bullet:player', None, player1)
     game_world.add_collision_pair('bullet:player', None, player2)
 
+    game_world.add_collision_pair('weapon:bullet', player1, None)
+    game_world.add_collision_pair('weapon:bullet', player2, None)
+
 def update():
     game_world.update()
     game_world.handle_collisions()
