@@ -535,14 +535,17 @@ class Punch:
 
     def handle_collision(self, group, other):
         if group == 'weapon:player':
-            weapon_bb = self.get_weapon_bb()
+            if self.player_id == other.player_id:
+                return
+
+            weapon_bb = other.get_weapon_bb()
             if weapon_bb:
                 weapon_left, weapon_bottom, weapon_right, weapon_top = weapon_bb
-                other_left, other_bottom, other_right, other_top = other.get_bb()
+                my_left, my_bottom, my_right, my_top = self.get_bb()
 
-                if weapon_left < other_right and weapon_right > other_left and \
-                   weapon_bottom < other_top and weapon_top > other_bottom:
-                    print(f'Player {self.player_id} weapon hit Player {other.player_id}!')
+                if weapon_left < my_right and weapon_right > my_left and \
+                   weapon_bottom < my_top and weapon_top > my_bottom:
+                    print(f'Player {other.player_id} weapon hit Player {self.player_id}!')
 
         if group == 'player:tile':
             punch_left, punch_bottom, punch_right, punch_top = self.get_bb()

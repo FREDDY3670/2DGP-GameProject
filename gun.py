@@ -45,10 +45,11 @@ FRAMES_PER_ACTION = 8
 
 
 class Bullet:
-    def __init__(self, x, y, direction):
+    def __init__(self, x, y, direction, shooter_id):
         self.x, self.y = x , y-25
         self.direction = direction
         self.speed = 750
+        self.shooter_id = shooter_id
 
     def update(self):
         self.x += self.direction * self.speed * game_framework.frame_time
@@ -58,6 +59,17 @@ class Bullet:
 
     def draw(self):
         Gun.bullet_image.draw(self.x, self.y,200,200)
+
+    def get_bb(self):
+        return self.x - 20, self.y - 20, self.x + 20, self.y + 20
+
+    def handle_collision(self, group, other):
+        if group == 'bullet:player':
+            if self.shooter_id == other.player_id:
+                return
+
+            print(f'Bullet from Player {self.shooter_id} hit Player {other.player_id}!')
+            game_world.remove_object(self)
 
 class Idle:
     def __init__(self,Gun):
@@ -343,14 +355,17 @@ class Gun:
 
     def handle_collision(self, group, other):
         if group == 'weapon:player':
-            weapon_bb = self.get_weapon_bb()
+            if self.player_id == other.player_id:
+                return
+
+            weapon_bb = other.get_weapon_bb()
             if weapon_bb:
                 weapon_left, weapon_bottom, weapon_right, weapon_top = weapon_bb
-                other_left, other_bottom, other_right, other_top = other.get_bb()
+                my_left, my_bottom, my_right, my_top = self.get_bb()
 
-                if weapon_left < other_right and weapon_right > other_left and \
-                   weapon_bottom < other_top and weapon_top > other_bottom:
-                    print(f'Player {self.player_id} weapon hit Player {other.player_id}!')
+                if weapon_left < my_right and weapon_right > my_left and \
+                   weapon_bottom < my_top and weapon_top > my_bottom:
+                    print(f'Player {other.player_id} weapon hit Player {self.player_id}!')
 
         if group == 'player:tile':
             gun_left, gun_bottom, gun_right, gun_top = self.get_bb()
@@ -406,5 +421,6 @@ class Gun:
         self.state_machine.draw()
 
     def shoot(self):
-        bullet = Bullet(self.x, self.y, self.face_dir)
+        bullet = Bullet(self.x, self.y, self.face_dir, self.player_id)
         game_world.add_object(bullet,1)
+        game_world.add_collision_pair('bullet:player', bullet, None)
