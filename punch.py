@@ -209,6 +209,45 @@ class Idle:
                     elif frame == 6:
                         return self.Punch.x - 20, self.Punch.y - 100, self.Punch.x + 20, self.Punch.y - 10
 
+    def get_weapon_bb(self):
+        if not self.atk:
+            return None
+
+        frame = int(self.Punch.frame)
+
+        if self.Punch.face_dir == 1:
+            if self.atk_count == 1:
+                if frame == 2:
+                    return self.Punch.x + 20, self.Punch.y - 100, self.Punch.x + 70, self.Punch.y - 20
+                else:
+                    return None
+            elif self.atk_count == 2:
+                if frame == 1 or frame == 2:
+                    return self.Punch.x + 20, self.Punch.y - 100, self.Punch.x + 50, self.Punch.y - 10
+                else:
+                    return None
+            else:
+                if frame >= 2 and frame <= 5:
+                    return self.Punch.x + 15, self.Punch.y - 100, self.Punch.x + 45, self.Punch.y + 12
+                else:
+                    return None
+        else:
+            if self.atk_count == 1:
+                if frame == 2:
+                    return self.Punch.x - 70, self.Punch.y - 100, self.Punch.x - 20, self.Punch.y - 20
+                else:
+                    return None
+            elif self.atk_count == 2:
+                if frame == 1 or frame == 2:
+                    return self.Punch.x - 50, self.Punch.y - 100, self.Punch.x - 20, self.Punch.y - 10
+                else:
+                    return None
+            else:
+                if frame >= 2 and frame <= 5:
+                    return self.Punch.x - 45, self.Punch.y - 100, self.Punch.x - 15, self.Punch.y + 12
+                else:
+                    return None
+
     def enter(self, e):
         if e and space_down(e):
             self.atk = True
@@ -302,6 +341,14 @@ class Jump:
                 return self.Punch.x - 20, self.Punch.y - 110, self.Punch.x + 20, self.Punch.y - 20
             else:
                 return self.Punch.x - 50, self.Punch.y - 110, self.Punch.x + 40, self.Punch.y - 40
+
+    def get_weapon_bb(self):
+        if self.atk and self.Punch.frame == 2:
+            if self.Punch.face_dir == 1:
+                return self.Punch.x - 20, self.Punch.y - 110, self.Punch.x + 20, self.Punch.y - 20
+            else:
+                return self.Punch.x - 50, self.Punch.y - 110, self.Punch.x + 40, self.Punch.y - 40
+        return None
 
     def enter(self, e):
         if e and up_down(e) and self.Punch.on_ground:
@@ -487,6 +534,16 @@ class Punch:
         self.state_machine.handle_state_event(('INPUT', event))
 
     def handle_collision(self, group, other):
+        if group == 'weapon:player':
+            weapon_bb = self.get_weapon_bb()
+            if weapon_bb:
+                weapon_left, weapon_bottom, weapon_right, weapon_top = weapon_bb
+                other_left, other_bottom, other_right, other_top = other.get_bb()
+
+                if weapon_left < other_right and weapon_right > other_left and \
+                   weapon_bottom < other_top and weapon_top > other_bottom:
+                    print(f'Player {self.player_id} weapon hit Player {other.player_id}!')
+
         if group == 'player:tile':
             punch_left, punch_bottom, punch_right, punch_top = self.get_bb()
             tile_left, tile_bottom, tile_right, tile_top = other.get_bb()
@@ -544,6 +601,9 @@ class Punch:
 
     def get_bb(self):
         return self.state_machine.cur_state.get_bb()
+
+    def get_weapon_bb(self):
+        return self.state_machine.cur_state.get_weapon_bb()
 
     def draw(self):
         self.state_machine.draw()
