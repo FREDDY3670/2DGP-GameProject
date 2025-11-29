@@ -425,6 +425,9 @@ class Sword:
     def get_bb(self):
         return self.state_machine.cur_state.get_bb()
 
+    def get_weapon_bb(self):
+        return self.state_machine.cur_state.get_weapon_bb()
+
     def handle_event(self, event):
         if self.player_id == 1:
             if event.type == SDL_KEYDOWN:
@@ -469,6 +472,16 @@ class Sword:
         self.state_machine.draw()
 
     def handle_collision(self, group, other):
+        if group == 'weapon:player':
+            weapon_bb = self.get_weapon_bb()
+            if weapon_bb:
+                weapon_left, weapon_bottom, weapon_right, weapon_top = weapon_bb
+                other_left, other_bottom, other_right, other_top = other.get_bb()
+
+                if weapon_left < other_right and weapon_right > other_left and \
+                   weapon_bottom < other_top and weapon_top > other_bottom:
+                    print(f'Player {self.player_id} weapon hit Player {other.player_id}!')
+
         if group == 'player:tile':
             sword_left, sword_bottom, sword_right, sword_top = self.state_machine.cur_state.get_bb()
             tile_left, tile_bottom, tile_right, tile_top = other.get_bb()
