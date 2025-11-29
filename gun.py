@@ -65,6 +65,9 @@ class Idle:
         self.atk = False
         self.atk_frame = 5
 
+    def get_weapon_bb(self):
+        return None
+
     def get_bb(self):
         if self.atk == False:
             return self.gun.x - 30, self.gun.y - 100, self.gun.x + 30, self.gun.y
@@ -111,6 +114,9 @@ class Jump:
     def __init__(self, Gun):
         self.gun = Gun
 
+    def get_weapon_bb(self):
+        return None
+
     def get_bb(self):
         if self.gun.face_dir == 1:
             return self.gun.x - 30, self.gun.y - 100, self.gun.x + 30, self.gun.y
@@ -140,6 +146,9 @@ class Run:
         self.gun = Gun
         self.atk = False
         self.atk_frame = 8
+
+    def get_weapon_bb(self):
+        return None
 
     def get_bb(self):
         if self.gun.face_dir == 1:
@@ -329,7 +338,20 @@ class Gun:
     def get_bb(self):
         return self.state_machine.cur_state.get_bb()
 
+    def get_weapon_bb(self):
+        return self.state_machine.cur_state.get_weapon_bb()
+
     def handle_collision(self, group, other):
+        if group == 'weapon:player':
+            weapon_bb = self.get_weapon_bb()
+            if weapon_bb:
+                weapon_left, weapon_bottom, weapon_right, weapon_top = weapon_bb
+                other_left, other_bottom, other_right, other_top = other.get_bb()
+
+                if weapon_left < other_right and weapon_right > other_left and \
+                   weapon_bottom < other_top and weapon_top > other_bottom:
+                    print(f'Player {self.player_id} weapon hit Player {other.player_id}!')
+
         if group == 'player:tile':
             gun_left, gun_bottom, gun_right, gun_top = self.get_bb()
             tile_left, tile_bottom, tile_right, tile_top = other.get_bb()
