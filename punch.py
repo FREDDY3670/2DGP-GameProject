@@ -249,7 +249,7 @@ class Idle:
                     return None
 
     def enter(self, e):
-        if e and space_down(e):
+        if e and space_down(e) and not self.atk:
             self.atk = True
             self.Punch.frame = 0
             self.atk_frame = 0
