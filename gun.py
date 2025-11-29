@@ -424,3 +424,4 @@ class Gun:
         bullet = Bullet(self.x, self.y, self.face_dir, self.player_id)
         game_world.add_object(bullet,1)
         game_world.add_collision_pair('bullet:player', bullet, None)
+        game_world.add_collision_pair('weapon:bullet', None, bullet)
