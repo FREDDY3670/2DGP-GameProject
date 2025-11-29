@@ -148,6 +148,8 @@ class Idle:
         if e and space_down(e):
             self.atk = True
             self.atk_count += 1
+            if self.atk_count > 3:
+                self.atk_count = 1
             self.combo_timer = 0
             self.Sword.frame = 0
     def get_bb(self):
@@ -161,8 +163,6 @@ class Idle:
                     return self.Sword.x - 15, self.Sword.y - 100, self.Sword.x + 55, self.Sword.y
                 elif self.row == 2:
                     return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 40, self.Sword.y
-                elif self.row == 3:
-                    return self.Sword.x - 50, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
             else:
                 if self.row == 0:
                     return self.Sword.x - 50, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
@@ -170,8 +170,6 @@ class Idle:
                     return self.Sword.x - 55, self.Sword.y - 100, self.Sword.x + 15, self.Sword.y
                 elif self.row == 2:
                     return self.Sword.x - 40, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
-                elif self.row == 3:
-                    return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 50, self.Sword.y
 
     def get_weapon_bb(self):
         if not self.atk:
@@ -182,18 +180,18 @@ class Idle:
         if self.row == 0:
             if self.Sword.face_dir == 1:
                 if frame <= 1:
-                    return self.Sword.x - 30, self.Sword.y - 60 , self.Sword.x - 10 , self.Sword.y
+                    return self.Sword.x + 10, self.Sword.y - 60 , self.Sword.x + 30 , self.Sword.y
                 elif frame == 2:
-                    return self.Sword.x - 25, self.Sword.y - 60, self.Sword.x , self.Sword.y
+                    return self.Sword.x, self.Sword.y - 60, self.Sword.x + 25, self.Sword.y
                 elif frame == 3:
                     return self.Sword.x, self.Sword.y - 60, self.Sword.x + 30, self.Sword.y
                 else:
                     return self.Sword.x + 20, self.Sword.y - 70, self.Sword.x + 70, self.Sword.y - 40
             else:
                 if frame <= 1:
-                    return self.Sword.x + 10, self.Sword.y - 60 , self.Sword.x + 30 , self.Sword.y
+                    return self.Sword.x - 30, self.Sword.y - 60 , self.Sword.x - 10 , self.Sword.y
                 elif frame == 2:
-                    return self.Sword.x , self.Sword.y - 60, self.Sword.x + 25, self.Sword.y
+                    return self.Sword.x - 25, self.Sword.y - 60, self.Sword.x, self.Sword.y
                 elif frame == 3:
                     return self.Sword.x - 30, self.Sword.y - 60, self.Sword.x , self.Sword.y
                 else:
@@ -221,22 +219,6 @@ class Idle:
                 else:
                     return self.Sword.x , self.Sword.y - 50, self.Sword.x + 30, self.Sword.y + 40
 
-        elif self.row == 3:
-            if self.Sword.face_dir == 1:
-                if frame == 1 or frame == 2 or frame == 0:
-                    return self.Sword.x - 50, self.Sword.y - 30, self.Sword.x - 20, self.Sword.y + 20
-                elif frame == 3 or frame == 4:
-                    return self.Sword.x - 50, self.Sword.y - 100, self.Sword.x + 75, self.Sword.y + 25
-                else:
-                    return self.Sword.x - 20, self.Sword.y - 20, self.Sword.x + 20, self.Sword.y + 30
-            else:
-                if frame == 1 or frame == 2 or frame == 0:
-                    return self.Sword.x + 20, self.Sword.y - 30, self.Sword.x + 50, self.Sword.y + 20
-                elif frame == 3 or frame == 4:
-                    return self.Sword.x - 75, self.Sword.y - 100, self.Sword.x + 50, self.Sword.y + 25
-                else:
-                    return self.Sword.x - 20, self.Sword.y - 20, self.Sword.x + 20, self.Sword.y + 30
-
         return None
 
     def exit(self, e):
@@ -245,13 +227,11 @@ class Idle:
     def do(self):
         if self.atk:
             if self.atk_frame == 0:
-                self.row = (3 - self.atk_count + 1) % 4
+                self.row = 3 - self.atk_count
                 if self.row == 0:
                     self.atk_frame = 8
                 elif self.row == 1 or self.row == 2:
                     self.atk_frame = 5
-                elif self.row == 3:
-                    self.atk_frame = 6
             self.Sword.frame = (self.Sword.frame + 7 * ACTION_PER_TIME * game_framework.frame_time)
             if self.Sword.frame >= self.atk_frame:
                 self.atk = False
