@@ -61,6 +61,9 @@ def init():
     for tile in map.tiles:
         game_world.add_collision_pair('player:tile', None, tile)
 
+    game_world.add_collision_pair('weapon:player', player1, player2)
+    game_world.add_collision_pair('weapon:player', player2, player1)
+
 def update():
     game_world.update()
     game_world.handle_collisions()
