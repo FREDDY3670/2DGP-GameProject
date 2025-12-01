@@ -343,6 +343,9 @@ class Sword:
         self.left_pressed = False
         self.right_pressed = False
 
+        self.knockback_velocity = 0
+        self.knockback_friction = 1500.0
+
         self.IDLE = Idle(self)
         self.RUN = Run(self)
         self.JUMP = Jump(self)
@@ -390,6 +393,20 @@ class Sword:
             self.velocity_x = 0
 
         self.x += self.velocity_x * game_framework.frame_time
+
+        # 넉백 처리
+        if self.knockback_velocity != 0:
+            self.x += self.knockback_velocity * game_framework.frame_time
+            # 넉백 감속
+            if self.knockback_velocity > 0:
+                self.knockback_velocity -= self.knockback_friction * game_framework.frame_time
+                if self.knockback_velocity < 0:
+                    self.knockback_velocity = 0
+            else:
+                self.knockback_velocity += self.knockback_friction * game_framework.frame_time
+                if self.knockback_velocity > 0:
+                    self.knockback_velocity = 0
+
         sword_left, _, sword_right, _ = self.get_bb()
         left_offset = self.x - sword_left
         right_offset = sword_right - self.x

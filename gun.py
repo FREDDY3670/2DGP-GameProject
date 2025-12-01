@@ -68,6 +68,10 @@ class Bullet:
             if self.shooter_id == other.player_id:
                 return
 
+            # 넉백 적용 (총알 방향으로)
+            knockback_force = 300
+            other.knockback_velocity = self.direction * knockback_force
+
             print(f'Bullet from Player {self.shooter_id} hit Player {other.player_id}!')
             game_world.remove_object(self)
 
@@ -244,6 +248,9 @@ class Gun:
         self.left_pressed = False
         self.right_pressed = False
 
+        self.knockback_velocity = 0
+        self.knockback_friction = 1500.0
+
         self.IDLE = Idle(self)
         self.RUN = Run(self)
         self.JUMP = Jump(self)
@@ -291,6 +298,19 @@ class Gun:
             self.velocity_x = 0
 
         self.x += self.velocity_x * game_framework.frame_time
+
+        # 넉백 처리
+        if self.knockback_velocity != 0:
+            self.x += self.knockback_velocity * game_framework.frame_time
+            # 넉백 감속
+            if self.knockback_velocity > 0:
+                self.knockback_velocity -= self.knockback_friction * game_framework.frame_time
+                if self.knockback_velocity < 0:
+                    self.knockback_velocity = 0
+            else:
+                self.knockback_velocity += self.knockback_friction * game_framework.frame_time
+                if self.knockback_velocity > 0:
+                    self.knockback_velocity = 0
 
         # 맵 경계 제한 (0 ~ 1600)
         gun_left, _, gun_right, _ = self.get_bb()
