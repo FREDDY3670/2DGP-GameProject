@@ -68,8 +68,24 @@ class Bullet:
             if self.shooter_id == other.player_id:
                 return
 
-            # 넉백 적용 (총알 방향으로)
+            # 상대방이 무기로 막고 있는지 확인
+            weapon_bb = other.get_weapon_bb()
             knockback_force = 300
+
+            if weapon_bb:
+                weapon_left, weapon_bottom, weapon_right, weapon_top = weapon_bb
+                bullet_left, bullet_bottom, bullet_right, bullet_top = self.get_bb()
+
+                # 무기와 총알이 충돌하면 절반만 밀림
+                if weapon_left < bullet_right and weapon_right > bullet_left and \
+                   weapon_bottom < bullet_top and weapon_top > bullet_bottom:
+                    # 무기로 막았을 때는 절반의 넉백
+                    other.knockback_velocity = self.direction * knockback_force * 0.5
+                    print(f'Player {other.player_id} deflected bullet!')
+                    game_world.remove_object(self)
+                    return
+
+            # 무기로 막지 못했으면 전체 넉백 적용
             other.knockback_velocity = self.direction * knockback_force
 
             print(f'Bullet from Player {self.shooter_id} hit Player {other.player_id}!')
