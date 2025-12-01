@@ -551,16 +551,8 @@ class Punch:
 
     def handle_collision(self, group, other):
         if group == 'weapon:bullet':
-            weapon_bb = self.get_weapon_bb()
-            if weapon_bb:
-                weapon_left, weapon_bottom, weapon_right, weapon_top = weapon_bb
-                bullet_left, bullet_bottom, bullet_right, bullet_top = other.get_bb()
-
-                if weapon_left < bullet_right and weapon_right > bullet_left and \
-                   weapon_bottom < bullet_top and weapon_top > bullet_bottom:
-                    print(f'Player {self.player_id} deflected bullet with punch!')
-                    import game_world
-                    game_world.remove_object(other)
+            # bullet:player에서 넉백 처리를 하므로 여기서는 아무것도 하지 않음
+            pass
 
         if group == 'weapon:player':
             if self.player_id == other.player_id:
