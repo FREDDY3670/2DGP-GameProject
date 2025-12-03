@@ -267,6 +267,9 @@ class Gun:
         self.knockback_velocity = 0
         self.knockback_friction = 1500.0
 
+        self.hp = 6
+        self.max_hp = 6
+
         self.IDLE = Idle(self)
         self.RUN = Run(self)
         self.JUMP = Jump(self)
