@@ -405,7 +405,11 @@ class Gun:
 
                 if weapon_left < my_right and weapon_right > my_left and \
                    weapon_bottom < my_top and weapon_top > my_bottom:
-                    print(f'Player {other.player_id} weapon hit Player {self.player_id}!')
+                    self.hp -= 1
+                    print(f'Player {other.player_id} weapon hit Player {self.player_id}! HP: {self.hp}')
+
+                    if self.hp <= 0:
+                        print(f'Player {self.player_id} died!')
 
         if group == 'player:tile':
             gun_left, gun_bottom, gun_right, gun_top = self.get_bb()
