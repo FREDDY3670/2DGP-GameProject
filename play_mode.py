@@ -8,8 +8,10 @@ from punch import Punch
 from sword import Sword
 from tile import Tile
 import select_weapon
+from draw_hp_bar import HPBar
 
 select_map = random.randint(0, 4)
+hp_bar = None
 
 def handle_events():
     event_list = get_events()
@@ -26,12 +28,16 @@ def handle_events():
 
 
 def init():
+    global hp_bar
+
     p1_w = select_weapon.player1_weapon
     p2_w = select_weapon.player2_weapon
     print(p1_w, p2_w)
 
     map = Map(select_map)
     game_world.add_object(map, 0)
+
+    hp_bar = HPBar()
 
     player1 = None
     if p1_w == 'Gun':
@@ -76,6 +82,10 @@ def update():
 def draw():
     clear_canvas()
     game_world.render()
+
+    if hp_bar:
+        hp_bar.draw(100, 100)
+
     update_canvas()
 
 def finish():
