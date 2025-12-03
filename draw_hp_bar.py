@@ -8,5 +8,9 @@ class HPBar:
             HPBar.image = load_image('hp.png')
 
     def draw(self, player1_hp, player2_hp):
-        HPBar.image.clip_draw(0, 0, 208, 18, 104, 900 - 9, 208, 18)
-        HPBar.image.clip_draw(0, 0, 208, 18, 1600 - 104, 900 - 9, 208, 18)
+        HPBar.image.clip_draw(0, 0, 16, 18, 50, 870, 32, 36)
+        HPBar.image.clip_draw(0, 0, 16, 18, 1600 - 50, 870, 32, 36)
+        HPBar.image.clip_draw(0, 0, 16, 18, 90, 870, 32, 36)
+        HPBar.image.clip_draw(0, 0, 16, 18, 1600 - 90, 870, 32, 36)
+        HPBar.image.clip_draw(0, 0, 16, 18, 130, 870, 32, 36)
+        HPBar.image.clip_draw(0, 0, 16, 18, 1600 - 130, 870, 32, 36)
