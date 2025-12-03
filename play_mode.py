@@ -12,6 +12,8 @@ from draw_hp_bar import HPBar
 
 select_map = random.randint(0, 4)
 hp_bar = None
+player1 = None
+player2 = None
 
 def handle_events():
     event_list = get_events()
@@ -28,7 +30,7 @@ def handle_events():
 
 
 def init():
-    global hp_bar
+    global hp_bar, player1, player2
 
     p1_w = select_weapon.player1_weapon
     p2_w = select_weapon.player2_weapon
@@ -83,8 +85,8 @@ def draw():
     clear_canvas()
     game_world.render()
 
-    if hp_bar:
-        hp_bar.draw(100, 100)
+    if hp_bar and player1 and player2:
+        hp_bar.draw(player1.hp, player2.hp)
 
     update_canvas()
 

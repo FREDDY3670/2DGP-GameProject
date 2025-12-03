@@ -76,19 +76,20 @@ class Bullet:
                 weapon_left, weapon_bottom, weapon_right, weapon_top = weapon_bb
                 bullet_left, bullet_bottom, bullet_right, bullet_top = self.get_bb()
 
-                # 무기와 총알이 충돌하면 절반만 밀림
                 if weapon_left < bullet_right and weapon_right > bullet_left and \
                    weapon_bottom < bullet_top and weapon_top > bullet_bottom:
-                    # 무기로 막았을 때는 절반의 넉백
                     other.knockback_velocity = self.direction * knockback_force * 0.5
                     print(f'Player {other.player_id} deflected bullet!')
                     game_world.remove_object(self)
                     return
 
-            # 무기로 막지 못했으면 전체 넉백 적용
             other.knockback_velocity = self.direction * knockback_force
+            other.hp -= 1
+            print(f'Bullet hit Player {other.player_id}! HP: {other.hp}')
 
-            print(f'Bullet from Player {self.shooter_id} hit Player {other.player_id}!')
+            if other.hp <= 0:
+                print(f'Player {other.player_id} died!')
+
             game_world.remove_object(self)
 
 class Idle:
