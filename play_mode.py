@@ -19,8 +19,8 @@ round_state = 'playing'
 round_timer = 0.0
 ROUND_DELAY = 2.0
 current_round = 1
-player1_round_hp = [6, 6, 6]
-player2_round_hp = [6, 6, 6]
+player1_loses = 0
+player2_loses = 0
 
 def handle_events():
     event_list = get_events()
@@ -37,11 +37,11 @@ def handle_events():
 
 
 def init():
-    global hp_bar, player1, player2, current_round, player1_round_hp, player2_round_hp, round_state
+    global hp_bar, player1, player2, current_round, player1_loses, player2_loses, round_state
 
     current_round = 1
-    player1_round_hp = [6, 6, 6]
-    player2_round_hp = [6, 6, 6]
+    player1_loses = 0
+    player2_loses = 0
     round_state = 'playing'
 
     p1_w = select_weapon.player1_weapon
@@ -90,7 +90,7 @@ def init():
     game_world.add_collision_pair('weapon:bullet', player2, None)
 
 def reset_players():
-    global round_state, current_round, player1_round_hp, player2_round_hp
+    global round_state, current_round, player1_loses, player2_loses
 
     for layer in game_world.world:
         for obj in layer[:]:
@@ -120,42 +120,35 @@ def reset_players():
         player2.right_pressed = False
 
     current_round += 1
-    if current_round > 3:
-        print("Game Over!")
+    if player1_loses >= 3 or player2_loses >= 3:
+        if player1_loses < player2_loses:
+            print(f"Player 1 WINS THE GAME!")
+        else:
+            print(f"Player 2 WINS THE GAME!")
         current_round = 1
-        player1_round_hp[0] = 6
-        player1_round_hp[1] = 6
-        player1_round_hp[2] = 6
-        player2_round_hp[0] = 6
-        player2_round_hp[1] = 6
-        player2_round_hp[2] = 6
+        player1_loses = 0
+        player2_loses = 0
 
     round_state = 'playing'
 
 def update():
-    global round_state, round_timer, player1_round_hp, player2_round_hp
+    global round_state, round_timer, player1_loses, player2_loses
 
     if round_state == 'playing':
         game_world.update()
         game_world.handle_collisions()
 
-        if player1:
-            player1_round_hp[current_round - 1] = max(0, player1.hp)
-
-        if player2:
-            player2_round_hp[current_round - 1] = max(0, player2.hp)
-
         if player1 and player1.hp <= 0:
             round_state = 'round_end'
             round_timer = 0.0
-            player1_round_hp[current_round - 1] = 0
-            print(f"Player 2 wins round {current_round}!")
+            player1_loses += 1  # player1이 죽으면 player1_loses 증가
+            print(f"Player 2 wins round {current_round}! (P1 loses: {player1_loses}, P2 loses: {player2_loses})")
 
         elif player2 and player2.hp <= 0:
             round_state = 'round_end'
             round_timer = 0.0
-            player2_round_hp[current_round - 1] = 0
-            print(f"Player 1 wins round {current_round}!")
+            player2_loses += 1  # player2가 죽으면 player2_loses 증가
+            print(f"Player 1 wins round {current_round}! (P1 loses: {player1_loses}, P2 loses: {player2_loses})")
 
     elif round_state == 'round_end':
         round_timer += game_framework.frame_time
@@ -167,7 +160,9 @@ def draw():
     game_world.render()
 
     if hp_bar:
-        hp_bar.draw(player1_round_hp, player2_round_hp)
+        p1_current_hp = player1.hp if player1 else 0
+        p2_current_hp = player2.hp if player2 else 0
+        hp_bar.draw(player1_loses, player2_loses, p1_current_hp, p2_current_hp)
 
     update_canvas()
 

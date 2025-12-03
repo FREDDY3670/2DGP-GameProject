@@ -4,6 +4,10 @@ frame_time = 0.0
 running = None
 stack = None
 
+def get_time():
+    """현재 시간을 반환하는 함수"""
+    return time.time()
+
 def change_mode(mode):
     global stack
     if (len(stack) > 0):

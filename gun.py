@@ -269,6 +269,9 @@ class Gun:
         self.hp = 6
         self.max_hp = 6
 
+        self.hit_cooldown = 0.5  # 0.5초 쿨타임
+        self.last_hit_time = 0.0  # 마지막으로 맞은 시간
+
         self.IDLE = Idle(self)
         self.RUN = Run(self)
         self.JUMP = Jump(self)
@@ -403,9 +406,13 @@ class Gun:
 
                 if weapon_left < my_right and weapon_right > my_left and \
                    weapon_bottom < my_top and weapon_top > my_bottom:
-                    if self.hp > 0:
-                        self.hp -= 1
-                        print(f'Player {other.player_id} weapon hit Player {self.player_id}! HP: {self.hp}')
+                    # 쿨타임 체크
+                    current_time = game_framework.get_time()
+                    if current_time - self.last_hit_time >= self.hit_cooldown:
+                        if self.hp > 0:
+                            self.hp -= 1
+                            self.last_hit_time = current_time
+                            print(f'Player {other.player_id} hit Player {self.player_id}! HP: {self.hp}')
 
         if group == 'player:tile':
             gun_left, gun_bottom, gun_right, gun_top = self.get_bb()
