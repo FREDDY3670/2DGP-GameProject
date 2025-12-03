@@ -18,6 +18,9 @@ player2 = None
 round_state = 'playing'
 round_timer = 0.0
 ROUND_DELAY = 2.0
+current_round = 1
+player1_round_hp = [6, 6, 6]
+player2_round_hp = [6, 6, 6]
 
 def handle_events():
     event_list = get_events()
@@ -34,7 +37,12 @@ def handle_events():
 
 
 def init():
-    global hp_bar, player1, player2
+    global hp_bar, player1, player2, current_round, player1_round_hp, player2_round_hp, round_state
+
+    current_round = 1
+    player1_round_hp = [6, 6, 6]
+    player2_round_hp = [6, 6, 6]
+    round_state = 'playing'
 
     p1_w = select_weapon.player1_weapon
     p2_w = select_weapon.player2_weapon
@@ -82,7 +90,7 @@ def init():
     game_world.add_collision_pair('weapon:bullet', player2, None)
 
 def reset_players():
-    global round_state
+    global round_state, current_round, player1_round_hp, player2_round_hp
 
     for layer in game_world.world:
         for obj in layer[:]:
@@ -111,24 +119,43 @@ def reset_players():
         player2.left_pressed = False
         player2.right_pressed = False
 
+    current_round += 1
+    if current_round > 3:
+        print("Game Over!")
+        current_round = 1
+        player1_round_hp[0] = 6
+        player1_round_hp[1] = 6
+        player1_round_hp[2] = 6
+        player2_round_hp[0] = 6
+        player2_round_hp[1] = 6
+        player2_round_hp[2] = 6
+
     round_state = 'playing'
 
 def update():
-    global round_state, round_timer
+    global round_state, round_timer, player1_round_hp, player2_round_hp
 
     if round_state == 'playing':
         game_world.update()
         game_world.handle_collisions()
 
+        if player1:
+            player1_round_hp[current_round - 1] = max(0, player1.hp)
+
+        if player2:
+            player2_round_hp[current_round - 1] = max(0, player2.hp)
+
         if player1 and player1.hp <= 0:
             round_state = 'round_end'
             round_timer = 0.0
-            print("Player 2 wins this round!")
+            player1_round_hp[current_round - 1] = 0
+            print(f"Player 2 wins round {current_round}!")
 
         elif player2 and player2.hp <= 0:
             round_state = 'round_end'
             round_timer = 0.0
-            print("Player 1 wins this round!")
+            player2_round_hp[current_round - 1] = 0
+            print(f"Player 1 wins round {current_round}!")
 
     elif round_state == 'round_end':
         round_timer += game_framework.frame_time
@@ -139,8 +166,8 @@ def draw():
     clear_canvas()
     game_world.render()
 
-    if hp_bar and player1 and player2:
-        hp_bar.draw(player1.hp, player2.hp)
+    if hp_bar:
+        hp_bar.draw(player1_round_hp, player2_round_hp)
 
     update_canvas()
 
