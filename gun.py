@@ -83,12 +83,10 @@ class Bullet:
                     game_world.remove_object(self)
                     return
 
-            other.knockback_velocity = self.direction * knockback_force
-            other.hp -= 1
-            print(f'Bullet hit Player {other.player_id}! HP: {other.hp}')
-
-            if other.hp <= 0:
-                print(f'Player {other.player_id} died!')
+            if other.hp > 0:
+                other.knockback_velocity = self.direction * knockback_force
+                other.hp -= 1
+                print(f'Bullet hit Player {other.player_id}! HP: {other.hp}')
 
             game_world.remove_object(self)
 
@@ -405,11 +403,9 @@ class Gun:
 
                 if weapon_left < my_right and weapon_right > my_left and \
                    weapon_bottom < my_top and weapon_top > my_bottom:
-                    self.hp -= 1
-                    print(f'Player {other.player_id} weapon hit Player {self.player_id}! HP: {self.hp}')
-
-                    if self.hp <= 0:
-                        print(f'Player {self.player_id} died!')
+                    if self.hp > 0:
+                        self.hp -= 1
+                        print(f'Player {other.player_id} weapon hit Player {self.player_id}! HP: {self.hp}')
 
         if group == 'player:tile':
             gun_left, gun_bottom, gun_right, gun_top = self.get_bb()

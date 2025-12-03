@@ -487,11 +487,9 @@ class Sword:
 
                 if weapon_left < my_right and weapon_right > my_left and \
                    weapon_bottom < my_top and weapon_top > my_bottom:
-                    self.hp -= 1
-                    print(f'Player {other.player_id} sword hit Player {self.player_id}! HP: {self.hp}')
-
-                    if self.hp <= 0:
-                        print(f'Player {self.player_id} died!')
+                    if self.hp > 0:
+                        self.hp -= 1
+                        print(f'Player {other.player_id} sword hit Player {self.player_id}! HP: {self.hp}')
 
         if group == 'player:tile':
             sword_left, sword_bottom, sword_right, sword_top = self.state_machine.cur_state.get_bb()
