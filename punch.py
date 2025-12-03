@@ -564,6 +564,11 @@ class Punch:
             if self.player_id == other.player_id:
                 return
 
+            # play_mode의 round_state 확인
+            import play_mode
+            if hasattr(play_mode, 'round_state') and play_mode.round_state != 'playing':
+                return
+
             weapon_bb = other.get_weapon_bb()
             if weapon_bb:
                 weapon_left, weapon_bottom, weapon_right, weapon_top = weapon_bb

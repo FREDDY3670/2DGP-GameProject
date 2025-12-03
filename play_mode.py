@@ -138,13 +138,16 @@ def update():
         game_world.update()
         game_world.handle_collisions()
 
+        # HP가 0 이하가 되면 즉시 라운드 종료
         if player1 and player1.hp <= 0:
+            player1.hp = 0  # HP를 0으로 고정
             round_state = 'round_end'
             round_timer = 0.0
             player1_loses += 1  # player1이 죽으면 player1_loses 증가
             print(f"Player 2 wins round {current_round}! (P1 loses: {player1_loses}, P2 loses: {player2_loses})")
 
         elif player2 and player2.hp <= 0:
+            player2.hp = 0  # HP를 0으로 고정
             round_state = 'round_end'
             round_timer = 0.0
             player2_loses += 1  # player2가 죽으면 player2_loses 증가
