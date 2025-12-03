@@ -15,6 +15,10 @@ hp_bar = None
 player1 = None
 player2 = None
 
+round_state = 'playing'
+round_timer = 0.0
+ROUND_DELAY = 2.0
+
 def handle_events():
     event_list = get_events()
     for event in event_list:
@@ -77,9 +81,59 @@ def init():
     game_world.add_collision_pair('weapon:bullet', player1, None)
     game_world.add_collision_pair('weapon:bullet', player2, None)
 
+def reset_players():
+    global round_state
+
+    for layer in game_world.world:
+        for obj in layer[:]:
+            if hasattr(obj, 'shooter_id'):
+                game_world.remove_object(obj)
+
+    if player1:
+        player1.hp = 6
+        player1.x = 200
+        player1.y = 180
+        player1.velocity_x = 0
+        player1.velocity_y = 0
+        player1.knockback_velocity = 0
+        player1.on_ground = False
+        player1.left_pressed = False
+        player1.right_pressed = False
+
+    if player2:
+        player2.hp = 6
+        player2.x = 1400
+        player2.y = 180
+        player2.velocity_x = 0
+        player2.velocity_y = 0
+        player2.knockback_velocity = 0
+        player2.on_ground = False
+        player2.left_pressed = False
+        player2.right_pressed = False
+
+    round_state = 'playing'
+
 def update():
-    game_world.update()
-    game_world.handle_collisions()
+    global round_state, round_timer
+
+    if round_state == 'playing':
+        game_world.update()
+        game_world.handle_collisions()
+
+        if player1 and player1.hp <= 0:
+            round_state = 'round_end'
+            round_timer = 0.0
+            print("Player 2 wins this round!")
+
+        elif player2 and player2.hp <= 0:
+            round_state = 'round_end'
+            round_timer = 0.0
+            print("Player 1 wins this round!")
+
+    elif round_state == 'round_end':
+        round_timer += game_framework.frame_time
+        if round_timer >= ROUND_DELAY:
+            reset_players()
 
 def draw():
     clear_canvas()
