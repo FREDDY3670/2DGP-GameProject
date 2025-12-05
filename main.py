@@ -6,4 +6,3 @@ import game_framework
 open_canvas(1600,900)
 game_framework.run(start_mode)
 close_canvas()
-ㄱ

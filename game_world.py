@@ -39,10 +39,12 @@ def remove_object(o):
 
 
 def clear():
-    global world
+    global world, collision_pairs
 
     for layer in world:
         layer.clear()
+
+    collision_pairs = {}
 
 
 def collide(a, b):

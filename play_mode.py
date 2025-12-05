@@ -39,6 +39,9 @@ def handle_events():
 def init():
     global hp_bar, player1, player2, current_round, player1_loses, player2_loses, round_state
 
+    # 게임 월드 초기화
+    game_world.clear()
+
     current_round = 1
     player1_loses = 0
     player2_loses = 0
