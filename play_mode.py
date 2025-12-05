@@ -92,11 +92,23 @@ def init():
 def reset_players():
     global round_state, current_round, player1_loses, player2_loses
 
+    # 먼저 게임 종료 조건 체크 (3라운드 패배)
+    if player1_loses >= 3 or player2_loses >= 3:
+        if player1_loses < player2_loses:
+            print(f"Player 1 WINS THE GAME!")
+        else:
+            print(f"Player 2 WINS THE GAME!")
+        # select_weapon으로 돌아가기
+        game_framework.change_mode(select_weapon)
+        return
+
+    # 총알 제거
     for layer in game_world.world:
         for obj in layer[:]:
             if hasattr(obj, 'shooter_id'):
                 game_world.remove_object(obj)
 
+    # 플레이어 리셋
     if player1:
         player1.hp = 6
         player1.x = 200
@@ -120,14 +132,6 @@ def reset_players():
         player2.right_pressed = False
 
     current_round += 1
-    if player1_loses >= 3 or player2_loses >= 3:
-        if player1_loses < player2_loses:
-            print(f"Player 1 WINS THE GAME!")
-        else:
-            print(f"Player 2 WINS THE GAME!")
-        current_round = 1
-        player1_loses = 0
-        player2_loses = 0
 
     round_state = 'playing'
 

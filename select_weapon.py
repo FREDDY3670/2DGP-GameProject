@@ -18,7 +18,12 @@ bg = None
 select = 0
 
 def init():
-    global image_p, image_s,image_g,bg
+    global image_p, image_s, image_g, bg, player1_weapon, player2_weapon, select
+    # 무기 선택 초기화
+    player1_weapon = None
+    player2_weapon = None
+    select = 0
+
     if image_p == None:
         image_p = load_image('Punch0101-sheet.png')
     if image_s == None:
@@ -39,10 +44,10 @@ def update():
 
 def finish():
     global image_p, image_s, image_g, bg
-    del image_p
-    del image_s
-    del image_g
-    del bg
+    image_p = None
+    image_s = None
+    image_g = None
+    bg = None
 
 def draw():
     clear_canvas()
