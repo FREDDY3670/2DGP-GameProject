@@ -326,21 +326,11 @@ class Jump:
         self.DASH_SPEED = 400
 
     def get_bb(self):
-        if self.Punch.frame == 0:
-            if self.Punch.face_dir == 1:
-                return self.Punch.x - 25, self.Punch.y - 100, self.Punch.x + 30, self.Punch.y
-            else:
-                return self.Punch.x - 30, self.Punch.y - 100, self.Punch.x + 25, self.Punch.y
-        elif self.Punch.frame == 1:
-            if self.Punch.face_dir == 1:
-                return self.Punch.x - 20, self.Punch.y - 80, self.Punch.x + 25, self.Punch.y - 10
-            else:
-                return self.Punch.x - 25, self.Punch.y - 80, self.Punch.x + 20, self.Punch.y - 10
+        # y좌표 충돌박스 고정 (바닥 충돌처리 일관성 유지)
+        if self.Punch.face_dir == 1:
+            return self.Punch.x - 25, self.Punch.y - 100, self.Punch.x + 25, self.Punch.y
         else:
-            if self.Punch.face_dir == 1:
-                return self.Punch.x - 20, self.Punch.y - 110, self.Punch.x + 20, self.Punch.y - 20
-            else:
-                return self.Punch.x - 50, self.Punch.y - 110, self.Punch.x + 40, self.Punch.y - 40
+            return self.Punch.x - 25, self.Punch.y - 100, self.Punch.x + 25, self.Punch.y
 
     def get_weapon_bb(self):
         if self.atk and self.Punch.frame == 2:
@@ -588,56 +578,63 @@ class Punch:
             punch_left, punch_bottom, punch_right, punch_top = self.get_bb()
             tile_left, tile_bottom, tile_right, tile_top = other.get_bb()
 
-            # 현재 바운딩 박스 기준으로 이전 위치의 바운딩 박스 계산
-            current_left_offset = self.x - punch_left
-            current_right_offset = punch_right - self.x
-            current_bottom_offset = self.y - punch_bottom
+            # 충돌 여부 다시 확인
+            if punch_right <= tile_left or punch_left >= tile_right:
+                return
+            if punch_top <= tile_bottom or punch_bottom >= tile_top:
+                return
 
-            prev_left = self.prev_x - current_left_offset
-            prev_right = self.prev_x + current_right_offset
-            prev_bottom = self.prev_y - current_bottom_offset
+            # 겹침 계산
+            overlap_left = punch_right - tile_left
+            overlap_right = tile_right - punch_left
+            overlap_bottom = punch_top - tile_bottom
+            overlap_top = tile_top - punch_bottom
+
+            min_overlap_x = min(overlap_left, overlap_right)
+            min_overlap_y = min(overlap_bottom, overlap_top)
+
+            # 이전 위치 기반으로 충돌 방향 결정
+            prev_bottom = self.prev_y - 100  # 대략적인 바운딩 박스 하단
             prev_top = self.prev_y
+            prev_left = self.prev_x - 30
+            prev_right = self.prev_x + 30
 
-            overlap_x = min(punch_right - tile_left, tile_right - punch_left)
-            overlap_y = min(punch_top - tile_bottom, tile_top - punch_bottom)
-
-            was_above = prev_bottom >= tile_top
-            was_below = prev_top <= tile_bottom
-            was_left = prev_right <= tile_left
-            was_right = prev_left >= tile_right
-
-            if overlap_y < overlap_x:
-                if was_above:
-                    if isinstance(self.state_machine.cur_state, Jump):
-                        self.y = tile_top + 100
+            # 수직 충돌 우선 처리 (위에서 착지)
+            if prev_bottom >= tile_top - 5 and self.velocity_y <= 0:
+                # 위에서 떨어져서 착지
+                bb = self.get_bb()
+                bottom_offset = self.y - bb[1]
+                self.y = tile_top + bottom_offset
+                self.velocity_y = 0
+                self.on_ground = True
+                if isinstance(self.state_machine.cur_state, Jump):
+                    self.state_machine.cur_state.exit(None)
+                    if self.left_pressed or self.right_pressed:
+                        self.state_machine.cur_state = self.RUN
                     else:
-                        self.y = tile_top + current_bottom_offset
+                        self.state_machine.cur_state = self.IDLE
+                    self.state_machine.cur_state.enter(None)
+                return
 
-                    self.velocity_y = 0
-                    self.on_ground = True
-                    if isinstance(self.state_machine.cur_state, Jump):
-                        self.state_machine.cur_state.exit(None)
-                        if self.left_pressed or self.right_pressed:
-                            self.state_machine.cur_state = self.RUN
-                        else:
-                            self.state_machine.cur_state = self.IDLE
-                        self.state_machine.cur_state.enter(None)
-                    return
-                if was_below and self.velocity_y > 0:
-                    self.y = tile_bottom
-                    self.velocity_y = 0
-                    return
+            # 아래에서 머리 박음
+            if prev_top <= tile_bottom + 5 and self.velocity_y > 0:
+                self.velocity_y = 0
+                return
 
-            else:
-                if was_left:
-                    self.x = tile_left - current_right_offset
-                    self.velocity_x = 0
-                    return
+            # 좌우 충돌 처리
+            if min_overlap_x < min_overlap_y:
+                bb = self.get_bb()
+                left_offset = self.x - bb[0]
+                right_offset = bb[2] - self.x
 
-                if was_right:
-                    self.x = tile_right + current_left_offset
-                    self.velocity_x = 0
-                    return
+                if overlap_left < overlap_right:
+                    # 오른쪽에서 왼쪽으로 충돌
+                    self.x = tile_left - right_offset
+                else:
+                    # 왼쪽에서 오른쪽으로 충돌
+                    self.x = tile_right + left_offset
+                self.velocity_x = 0
+                return
 
     def get_bb(self):
         return self.state_machine.cur_state.get_bb()
