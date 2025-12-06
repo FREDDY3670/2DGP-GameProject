@@ -566,6 +566,45 @@ class Punch:
 
                 if weapon_left < my_right and weapon_right > my_left and \
                    weapon_bottom < my_top and weapon_top > my_bottom:
+
+                    # 상성 체크: 상대가 점프공격 중이고 내가 슬라이딩 중이면 회피
+                    from sword import Jump as SwordJump
+
+                    # 상대가 Sword의 점프공격 중인지 체크
+                    other_is_jump_attack = False
+                    if hasattr(other, 'state_machine'):
+                        if isinstance(other.state_machine.cur_state, SwordJump):
+                            if other.get_weapon_bb() is not None:  # 점프공격 중
+                                other_is_jump_attack = True
+
+                    # 내가 슬라이딩 중인지 체크 (Punch의 Run상태에서 atk=True)
+                    my_is_sliding = False
+                    if isinstance(self.state_machine.cur_state, Run):
+                        if self.state_machine.cur_state.atk:
+                            my_is_sliding = True
+
+                    # 상대 점프공격 vs 내 슬라이딩 = 회피 성공
+                    if other_is_jump_attack and my_is_sliding:
+                        print(f'Player {self.player_id} dodged jump attack with sliding!')
+                        return
+
+                    # 내가 점프공격 중이고 상대가 슬라이딩 중이면 회피 당함
+                    my_is_jump_attack = False
+                    if isinstance(self.state_machine.cur_state, Jump):
+                        if self.state_machine.cur_state.atk:
+                            my_is_jump_attack = True
+
+                    other_is_sliding = False
+                    if hasattr(other, 'state_machine'):
+                        from punch import Run as PunchRun
+                        if isinstance(other.state_machine.cur_state, PunchRun):
+                            if other.state_machine.cur_state.atk:
+                                other_is_sliding = True
+
+                    if my_is_jump_attack and other_is_sliding:
+                        print(f'Player {self.player_id} jump attack was dodged by sliding!')
+                        return
+
                     # 쿨타임 체크
                     current_time = game_framework.get_time()
                     if current_time - self.last_hit_time >= self.hit_cooldown:
