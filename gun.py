@@ -114,8 +114,8 @@ class Idle:
         elif right_up(e):
             self.gun.face_dir = 1
         elif space_down(e):
-            self.atk = True
-            self.gun.shoot()
+            if self.gun.shoot():  # shoot()가 True를 반환하면 공격 성공
+                self.atk = True
     def exit(self,e):
         self.atk = False
     def do(self):
@@ -195,8 +195,8 @@ class Run:
         elif left_down(e):
             self.gun.face_dir = -1
         elif space_down(e):
-            self.atk = True
-            self.gun.shoot()
+            if self.gun.shoot():  # shoot()가 True를 반환하면 공격 성공
+                self.atk = True
     def exit(self,e):
         self.atk = False
     def do(self):
@@ -271,6 +271,9 @@ class Gun:
 
         self.hit_cooldown = 0.5  # 0.5초 쿨타임
         self.last_hit_time = 0.0  # 마지막으로 맞은 시간
+
+        self.attack_cooldown = 0.5  # 공격 딜레이 0.5초
+        self.last_attack_time = 0.0  # 마지막 공격 시간
 
         self.IDLE = Idle(self)
         self.RUN = Run(self)
@@ -473,7 +476,12 @@ class Gun:
         self.state_machine.draw()
 
     def shoot(self):
+        current_time = game_framework.get_time()
+        if current_time - self.last_attack_time < self.attack_cooldown:
+            return False  # 쿨타임 중이면 발사 안함
+        self.last_attack_time = current_time
         bullet = Bullet(self.x, self.y, self.face_dir, self.player_id)
         game_world.add_object(bullet,1)
         game_world.add_collision_pair('bullet:player', bullet, None)
         game_world.add_collision_pair('weapon:bullet', None, bullet)
+        return True  # 발사 성공
