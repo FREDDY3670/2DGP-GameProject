@@ -498,43 +498,40 @@ class Sword:
             if hasattr(play_mode, 'round_state') and play_mode.round_state != 'playing':
                 return
 
+            # game_world에서 이미 weapon_bb vs get_bb 충돌 확인됨
+            # 상대의 weapon_bb가 내 get_bb와 충돌한 경우에만 여기로 옴
             weapon_bb = other.get_weapon_bb()
-            if weapon_bb:
-                weapon_left, weapon_bottom, weapon_right, weapon_top = weapon_bb
-                my_left, my_bottom, my_right, my_top = self.get_bb()
+            if weapon_bb is None:
+                return
 
-                if weapon_left < my_right and weapon_right > my_left and \
-                   weapon_bottom < my_top and weapon_top > my_bottom:
+            # 상성 체크: 상대가 점프공격 중이고 내가 슬라이딩 중이면 회피
+            from sword import Jump as SwordJump
 
-                    # 상성 체크: 상대가 점프공격 중이고 내가 슬라이딩 중이면 회피
-                    from punch import Punch as PunchClass
-                    from sword import Jump as SwordJump
+            # 상대가 Sword의 점프공격 중인지 체크
+            other_is_jump_attack = False
+            if hasattr(other, 'state_machine'):
+                if isinstance(other.state_machine.cur_state, SwordJump):
+                    if other.get_weapon_bb() is not None:  # 점프공격 중
+                        other_is_jump_attack = True
 
-                    # 상대가 Sword의 점프공격 중인지 체크
-                    other_is_jump_attack = False
-                    if hasattr(other, 'state_machine'):
-                        if isinstance(other.state_machine.cur_state, SwordJump):
-                            if other.get_weapon_bb() is not None:  # 점프공격 중
-                                other_is_jump_attack = True
+            # 내가 슬라이딩 중인지 체크 (Punch의 Run상태에서 atk=True)
+            my_is_sliding = False
+            if isinstance(self.state_machine.cur_state, Run):
+                if self.state_machine.cur_state.atk:
+                    my_is_sliding = True
 
-                    # 내가 슬라이딩 중인지 체크 (Punch의 Run상태에서 atk=True)
-                    my_is_sliding = False
-                    if isinstance(self.state_machine.cur_state, Run):
-                        if self.state_machine.cur_state.atk:
-                            my_is_sliding = True
+            # 상대 점프공격 vs 내 슬라이딩 = 회피 성공
+            if other_is_jump_attack and my_is_sliding:
+                print(f'Player {self.player_id} dodged jump attack with sliding!')
+                return
 
-                    # 상대 점프공격 vs 내 슬라이딩 = 회피 성공
-                    if other_is_jump_attack and my_is_sliding:
-                        print(f'Player {self.player_id} dodged jump attack with sliding!')
-                        return
-
-                    # 쿨타임 체크
-                    current_time = game_framework.get_time()
-                    if current_time - self.last_hit_time >= self.hit_cooldown:
-                        if self.hp > 0:
-                            self.hp -= 1
-                            self.last_hit_time = current_time
-                            print(f'Player {other.player_id} hit Player {self.player_id}! HP: {self.hp}')
+            # 쿨타임 체크
+            current_time = game_framework.get_time()
+            if current_time - self.last_hit_time >= self.hit_cooldown:
+                if self.hp > 0:
+                    self.hp -= 1
+                    self.last_hit_time = current_time
+                    print(f'Player {other.player_id} hit Player {self.player_id}! HP: {self.hp}')
 
         if group == 'player:tile':
             sword_left, sword_bottom, sword_right, sword_top = self.state_machine.cur_state.get_bb()

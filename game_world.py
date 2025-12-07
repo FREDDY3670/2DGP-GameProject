@@ -58,6 +58,22 @@ def collide(a, b):
 
     return True
 
+def collide_weapon(attacker, target):
+    """weapon_bb와 get_bb 충돌 체크"""
+    weapon_bb = attacker.get_weapon_bb()
+    if weapon_bb is None:
+        return False
+
+    left_a, bottom_a, right_a, top_a = weapon_bb
+    left_b, bottom_b, right_b, top_b = target.get_bb()
+
+    if left_a > right_b : return False
+    if right_a < left_b : return False
+    if top_a < bottom_b : return False
+    if bottom_a > top_b : return False
+
+    return True
+
 collision_pairs = {}#key : 충돌 종류, value : [[a],[b]]
 def add_collision_pair(group, a, b):
     if group not in collision_pairs:
@@ -73,6 +89,15 @@ def handle_collisions():
     for group,pairs in collision_pairs.items():
         for a in pairs[0]:
             for b in pairs[1]:
-                if collide(a,b):
-                    a.handle_collision(group, b)
-                    b.handle_collision(group, a)
+                if group == 'weapon:player':
+                    # weapon_bb vs get_bb 충돌 체크 (양방향)
+                    if collide_weapon(a, b):
+                        a.handle_collision(group, b)
+                        b.handle_collision(group, a)
+                    if collide_weapon(b, a):
+                        a.handle_collision(group, b)
+                        b.handle_collision(group, a)
+                else:
+                    if collide(a,b):
+                        a.handle_collision(group, b)
+                        b.handle_collision(group, a)
