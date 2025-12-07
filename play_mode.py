@@ -8,6 +8,7 @@ from punch import Punch
 from sword import Sword
 from tile import Tile
 import select_weapon
+import select_ability
 from draw_hp_bar import HPBar
 
 select_map = random.randint(0, 4)
@@ -104,6 +105,10 @@ def reset_players():
         # select_weapon으로 돌아가기
         game_framework.change_mode(select_weapon)
         return
+
+    # 라운드 종료 시 select_ability로 이동
+    game_framework.change_mode(select_ability)
+    return
 
     # 총알 제거
     for layer in game_world.world:
