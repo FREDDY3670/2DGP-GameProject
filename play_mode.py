@@ -128,6 +128,10 @@ def init():
     game_world.add_collision_pair('weapon:bullet', player1, None)
     game_world.add_collision_pair('weapon:bullet', player2, None)
 
+    # 총알과 타일 충돌 페어 추가
+    for tile in map.tiles:
+        game_world.add_collision_pair('bullet:tile', None, tile)
+
 def _reset_players_only():
     """플레이어만 리셋 (라운드 정보 유지)"""
     global round_state, current_round, player1, player2, hp_bar
@@ -184,6 +188,10 @@ def _reset_players_only():
 
     game_world.add_collision_pair('weapon:bullet', player1, None)
     game_world.add_collision_pair('weapon:bullet', player2, None)
+
+    # 총알과 타일 충돌 페어 추가
+    for tile in map.tiles:
+        game_world.add_collision_pair('bullet:tile', None, tile)
 
     current_round += 1
     round_state = 'playing'

@@ -64,6 +64,11 @@ class Bullet:
         return self.x - 20, self.y - 20, self.x + 20, self.y + 20
 
     def handle_collision(self, group, other):
+        if group == 'bullet:tile':
+            # 타일과 충돌 시 총알 제거
+            game_world.remove_object(self)
+            return
+
         if group == 'bullet:player':
             if self.shooter_id == other.player_id:
                 return
@@ -494,5 +499,6 @@ class Gun:
         game_world.add_object(bullet,1)
         game_world.add_collision_pair('bullet:player', bullet, None)
         game_world.add_collision_pair('weapon:bullet', None, bullet)
+        game_world.add_collision_pair('bullet:tile', bullet, None)  # 총알-타일 충돌 등록
         Gun.pistol_sound.play()  # 총알 발사 시 소리 재생
         return True  # 발사 성공
