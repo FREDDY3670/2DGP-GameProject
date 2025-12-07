@@ -1,4 +1,4 @@
-from pico2d import load_image, draw_rectangle
+from pico2d import load_image, draw_rectangle, load_wav
 from sdl2 import SDLK_SPACE, SDL_KEYDOWN, SDLK_RETURN, SDLK_a, SDLK_LEFT, SDLK_RIGHT, SDLK_d, SDLK_w, SDLK_UP, \
     SDL_KEYUP, SDLK_DOWN, SDLK_s
 
@@ -92,6 +92,7 @@ class Run:
             self.atk_timer = 0
             self.slide_speed = self.INITIAL_SLIDE_SPEED
             self.Punch.frame = 0
+            Punch.kick_sound.play()  # 공격 시 사운드 재생
 
     def exit(self, e):
         self.atk = False
@@ -258,6 +259,7 @@ class Idle:
             else:
                 self.atk_count += 1
                 self.combo_timer = 0
+            Punch.kick_sound.play()  # 공격 시 사운드 재생
 
     def exit(self, e):
         pass
@@ -375,6 +377,7 @@ class Punch:
     image_run = None
     image_jump = None
     image_slide = None
+    kick_sound = None
 
     def __init__(self, player_id=1, start_x=100, start_y=180):
         if Punch.image_ia1 == None:
@@ -391,6 +394,9 @@ class Punch:
             Punch.image_jump = load_image('Jump01-sheet.png')
         if Punch.image_slide == None:
             Punch.image_slide = load_image('Slide04.png')
+        if Punch.kick_sound == None:
+            Punch.kick_sound = load_wav('kick.wav')
+            Punch.kick_sound.set_volume(32)
 
         self.player_id = player_id
         self.x, self.y = start_x, start_y
