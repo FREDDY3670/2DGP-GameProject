@@ -1,4 +1,4 @@
-from pico2d import load_image, draw_rectangle
+from pico2d import load_image, draw_rectangle, load_wav
 from sdl2 import SDL_KEYDOWN, SDLK_LEFT, SDLK_RIGHT, SDL_KEYUP, SDLK_SPACE, SDLK_d, SDLK_a, SDLK_RETURN, SDLK_w, \
     SDLK_UP, SDLK_s, SDLK_DOWN
 
@@ -101,6 +101,7 @@ class Run:
         elif space_down(e):
             self.atk = True
             self.Sword.frame = 0
+            Sword.sword_sound.play()  # 공격 시 사운드 재생
 
     def exit(self, e):
         self.atk = False
@@ -152,6 +153,7 @@ class Idle:
                 self.atk_count = 1
             self.combo_timer = 0
             self.Sword.frame = 0
+            Sword.sword_sound.play()  # 공격 시 사운드 재생
     def get_bb(self):
         if self.atk == False:
             return self.Sword.x - 30, self.Sword.y - 100, self.Sword.x + 30, self.Sword.y
@@ -314,6 +316,7 @@ class Sword:
     image_ia = None
     image_ra = None
     image_air = None
+    sword_sound = None
 
     def __init__(self, player_id = 1, start_x = 100, start_y = 180):
         if Sword.image_idle == None:
@@ -326,6 +329,9 @@ class Sword:
             Sword.image_ra = load_image('SwordRunSlash01_right.png')
         if Sword.image_air == None:
             Sword.image_air = load_image('Air_Slash.png')
+        if Sword.sword_sound == None:
+            Sword.sword_sound = load_wav('sword.wav')
+            Sword.sword_sound.set_volume(32)
 
         self.player_id = player_id
         self.x, self.y = start_x, start_y
