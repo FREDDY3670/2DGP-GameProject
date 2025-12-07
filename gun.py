@@ -1,4 +1,4 @@
-from pico2d import load_image, draw_rectangle
+from pico2d import load_image, draw_rectangle, load_wav
 from sdl2 import SDL_KEYDOWN, SDLK_LEFT, SDLK_RIGHT, SDL_KEYUP, SDLK_SPACE, SDLK_a, SDLK_d, SDLK_RETURN, SDLK_w, SDLK_UP
 
 import game_framework
@@ -232,6 +232,7 @@ class Gun:
     image_ra = None
     bullet_image = None
     image_jump = None
+    pistol_sound = None
 
     def __init__(self, player_id=1, start_x=100, start_y=180):
         if Gun.image_idle == None:
@@ -246,6 +247,9 @@ class Gun:
             Gun.bullet_image = load_image('Bullet02.png')
         if Gun.image_jump == None:
             Gun.image_jump = load_image('FrontFlip01-sheet.png')
+        if Gun.pistol_sound == None:
+            Gun.pistol_sound = load_wav('pistol.wav')
+            Gun.pistol_sound.set_volume(32)
 
         self.player_id = player_id
         self.x, self.y = start_x, start_y
@@ -490,4 +494,5 @@ class Gun:
         game_world.add_object(bullet,1)
         game_world.add_collision_pair('bullet:player', bullet, None)
         game_world.add_collision_pair('weapon:bullet', None, bullet)
+        Gun.pistol_sound.play()  # 총알 발사 시 소리 재생
         return True  # 발사 성공
