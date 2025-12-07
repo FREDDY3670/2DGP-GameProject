@@ -417,6 +417,10 @@ class Punch:
         self.hit_cooldown = 0.5  # 0.5초 쿨타임
         self.last_hit_time = 0.0  # 마지막으로 맞은 시간
 
+        # 능력 보너스
+        self.speed_bonus = 1.0
+        self.attack_bonus = 1.0
+
         self.IDLE = Idle(self)
         self.RUN = Run(self)
         self.JUMP = Jump(self)
@@ -451,10 +455,10 @@ class Punch:
                 # 점프 공격 시 전방 대시
                 self.velocity_x = self.state_machine.cur_state.DASH_SPEED * self.face_dir
             elif self.left_pressed:
-                self.velocity_x = -RUN_SPEED_PPS
+                self.velocity_x = -RUN_SPEED_PPS * self.speed_bonus
                 self.face_dir = -1
             elif self.right_pressed:
-                self.velocity_x = RUN_SPEED_PPS
+                self.velocity_x = RUN_SPEED_PPS * self.speed_bonus
                 self.face_dir = 1
             else:
                 self.velocity_x = 0
@@ -463,10 +467,10 @@ class Punch:
                 if self.left_pressed and self.right_pressed:
                     self.velocity_x = 0
                 elif self.left_pressed:
-                    self.velocity_x = -RUN_SPEED_PPS
+                    self.velocity_x = -RUN_SPEED_PPS * self.speed_bonus
                     self.face_dir = -1
                 elif self.right_pressed:
-                    self.velocity_x = RUN_SPEED_PPS
+                    self.velocity_x = RUN_SPEED_PPS * self.speed_bonus
                     self.face_dir = 1
                 else:
                     self.velocity_x = 0
@@ -544,6 +548,15 @@ class Punch:
                 return
 
         self.state_machine.handle_state_event(('INPUT', event))
+
+    def draw(self):
+        self.state_machine.draw()
+
+    def get_bb(self):
+        return self.state_machine.cur_state.get_bb()
+
+    def get_weapon_bb(self):
+        return self.state_machine.cur_state.get_weapon_bb()
 
     def handle_collision(self, group, other):
         if group == 'weapon:bullet':
@@ -674,12 +687,3 @@ class Punch:
                     self.x = tile_right + left_offset
                 self.velocity_x = 0
                 return
-
-    def get_bb(self):
-        return self.state_machine.cur_state.get_bb()
-
-    def get_weapon_bb(self):
-        return self.state_machine.cur_state.get_weapon_bb()
-
-    def draw(self):
-        self.state_machine.draw()

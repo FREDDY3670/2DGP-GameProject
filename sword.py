@@ -352,6 +352,10 @@ class Sword:
         self.hit_cooldown = 0.5  # 0.5초 쿨타임
         self.last_hit_time = 0.0  # 마지막으로 맞은 시간
 
+        # 능력 보너스
+        self.speed_bonus = 1.0
+        self.attack_bonus = 1.0
+
         self.IDLE = Idle(self)
         self.RUN = Run(self)
         self.JUMP = Jump(self)
@@ -377,10 +381,10 @@ class Sword:
         # 상태별 이동 처리
         if isinstance(self.state_machine.cur_state, Jump):
             if self.left_pressed:
-                self.velocity_x = -RUN_SPEED_PPS
+                self.velocity_x = -RUN_SPEED_PPS * self.speed_bonus
                 self.face_dir = -1
             elif self.right_pressed:
-                self.velocity_x = RUN_SPEED_PPS
+                self.velocity_x = RUN_SPEED_PPS * self.speed_bonus
                 self.face_dir = 1
             else:
                 self.velocity_x = 0
@@ -388,10 +392,10 @@ class Sword:
             if self.left_pressed and self.right_pressed:
                 self.velocity_x = 0
             elif self.left_pressed:
-                self.velocity_x = -RUN_SPEED_PPS
+                self.velocity_x = -RUN_SPEED_PPS * self.speed_bonus
                 self.face_dir = -1
             elif self.right_pressed:
-                self.velocity_x = RUN_SPEED_PPS
+                self.velocity_x = RUN_SPEED_PPS * self.speed_bonus
                 self.face_dir = 1
             else:
                 self.velocity_x = 0
@@ -571,4 +575,3 @@ class Sword:
                     self.x = tile_right + 30
                     self.velocity_x = 0
                     return
-

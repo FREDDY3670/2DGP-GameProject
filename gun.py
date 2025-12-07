@@ -275,6 +275,10 @@ class Gun:
         self.attack_cooldown = 0.5  # 공격 딜레이 0.5초
         self.last_attack_time = 0.0  # 마지막 공격 시간
 
+        # 능력 보너스
+        self.speed_bonus = 1.0
+        self.attack_bonus = 1.0
+
         self.IDLE = Idle(self)
         self.RUN = Run(self)
         self.JUMP = Jump(self)
@@ -300,10 +304,10 @@ class Gun:
 
         if isinstance(self.state_machine.cur_state, Jump):
             if self.left_pressed:
-                self.velocity_x = -RUN_SPEED_PPS
+                self.velocity_x = -RUN_SPEED_PPS * self.speed_bonus
                 self.face_dir = -1
             elif self.right_pressed:
-                self.velocity_x = RUN_SPEED_PPS
+                self.velocity_x = RUN_SPEED_PPS * self.speed_bonus
                 self.face_dir = 1
             else:
                 self.velocity_x = 0
@@ -311,10 +315,10 @@ class Gun:
             if self.left_pressed and self.right_pressed:
                 self.velocity_x = 0
             elif self.left_pressed:
-                self.velocity_x = -RUN_SPEED_PPS
+                self.velocity_x = -RUN_SPEED_PPS * self.speed_bonus
                 self.face_dir = -1
             elif self.right_pressed:
-                self.velocity_x = RUN_SPEED_PPS
+                self.velocity_x = RUN_SPEED_PPS * self.speed_bonus
                 self.face_dir = 1
             else:
                 self.velocity_x = 0
@@ -477,7 +481,9 @@ class Gun:
 
     def shoot(self):
         current_time = game_framework.get_time()
-        if current_time - self.last_attack_time < self.attack_cooldown:
+        # attack_bonus가 높을수록 쿨타임 감소
+        effective_cooldown = self.attack_cooldown / self.attack_bonus
+        if current_time - self.last_attack_time < effective_cooldown:
             return False  # 쿨타임 중이면 발사 안함
         self.last_attack_time = current_time
         bullet = Bullet(self.x, self.y, self.face_dir, self.player_id)
