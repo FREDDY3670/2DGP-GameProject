@@ -1,4 +1,4 @@
-from pico2d import load_image, draw_rectangle
+from pico2d import load_image
 
 
 class Tile:
@@ -12,8 +12,7 @@ class Tile:
         return self.x - 25, self.y - 25, self.x + 25, self.y + 25
 
     def draw(self):
-        draw_rectangle(*self.get_bb())
-        self.tile_image.draw(self.x, self.y,50,50)
+        self.tile_image.draw(self.x, self.y, 50, 50)
 
     def update(self):
         pass

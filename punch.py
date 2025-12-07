@@ -1,4 +1,4 @@
-from pico2d import load_image, draw_rectangle, load_wav
+from pico2d import load_image, load_wav
 from sdl2 import SDLK_SPACE, SDL_KEYDOWN, SDLK_RETURN, SDLK_a, SDLK_LEFT, SDLK_RIGHT, SDLK_d, SDLK_w, SDLK_UP, \
     SDL_KEYUP, SDLK_DOWN, SDLK_s
 
@@ -117,10 +117,6 @@ class Run:
             self.Punch.frame = (self.Punch.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
 
     def draw(self):
-        draw_rectangle(*self.get_bb())
-        weapon = self.get_weapon_bb()
-        if weapon:
-            draw_rectangle(*weapon)
         if self.atk == False:
             if self.Punch.face_dir == 1:
                 self.Punch.image_run.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200, 200)
@@ -291,7 +287,6 @@ class Idle:
                 self.Punch.frame = 0
 
     def draw(self):
-        draw_rectangle(*self.get_bb())
         if self.atk == False:
             if self.Punch.face_dir == 1:
                 self.Punch.image_idle.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200,
@@ -363,7 +358,6 @@ class Jump:
             self.Punch.frame = 1
 
     def draw(self):
-        draw_rectangle(*self.get_bb())
         if self.Punch.face_dir == 1:
             self.Punch.image_jump.clip_draw(int(self.Punch.frame) * 96, 0, 96, 84, self.Punch.x, self.Punch.y, 200, 200)
         else:

@@ -1,4 +1,4 @@
-from pico2d import load_image, draw_rectangle, load_wav
+from pico2d import load_image, load_wav
 from sdl2 import SDL_KEYDOWN, SDLK_LEFT, SDLK_RIGHT, SDL_KEYUP, SDLK_SPACE, SDLK_d, SDLK_a, SDLK_RETURN, SDLK_w, \
     SDLK_UP, SDLK_s, SDLK_DOWN
 
@@ -117,9 +117,6 @@ class Run:
             self.Sword.frame = (self.Sword.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
 
     def draw(self):
-        draw_rectangle(*self.get_bb())
-        if self.atk:
-            draw_rectangle(*self.get_weapon_bb())
         if self.atk == False:
             if self.Sword.face_dir == 1:  # right
                 self.Sword.image_run.clip_draw(int(self.Sword.frame) * 96, 0, 96, 84, self.Sword.x, self.Sword.y, 200,
@@ -250,9 +247,6 @@ class Idle:
                     self.Sword.frame = 0
 
     def draw(self):
-        draw_rectangle(*self.get_bb())
-        if self.atk:
-            draw_rectangle(*self.get_weapon_bb())
         if self.atk == False:
             if self.Sword.face_dir == 1:  # right
                 self.Sword.image_idle.clip_draw(int(self.Sword.frame) * 96, 0, 96, 84, self.Sword.x, self.Sword.y, 200,
@@ -299,16 +293,10 @@ class Jump:
         self.Sword.frame = (self.Sword.frame + 6 * ACTION_PER_TIME * game_framework.frame_time) % 6
 
     def draw(self):
-        draw_rectangle(*self.get_bb())
-        weapon_bb = self.get_weapon_bb()
-        if weapon_bb:
-            draw_rectangle(*weapon_bb)
         if self.Sword.face_dir == 1:
-            self.Sword.image_air.clip_draw(int(self.Sword.frame) * 96, 84, 96, 84, self.Sword.x, self.Sword.y, 200,
-                                           200)
+            self.Sword.image_air.clip_draw(int(self.Sword.frame) * 96, 84, 96, 84, self.Sword.x, self.Sword.y, 200, 200)
         else:
-            self.Sword.image_air.clip_composite_draw(int(self.Sword.frame) * 96, 84, 96, 84, 0, 'h', self.Sword.x,
-                                                     self.Sword.y, 200, 200)
+            self.Sword.image_air.clip_composite_draw(int(self.Sword.frame) * 96, 84, 96, 84, 0, 'h', self.Sword.x, self.Sword.y, 200, 200)
 
 class Sword:
     image_idle = None
@@ -486,52 +474,41 @@ class Sword:
 
     def handle_collision(self, group, other):
         if group == 'weapon:bullet':
-            # bullet:player에서 넉백 처리를 하므로 여기서는 아무것도 하지 않음
             pass
 
         if group == 'weapon:player':
             if self.player_id == other.player_id:
                 return
 
-            # play_mode의 round_state 확인
             import play_mode
             if hasattr(play_mode, 'round_state') and play_mode.round_state != 'playing':
                 return
 
-            # game_world에서 이미 weapon_bb vs get_bb 충돌 확인됨
-            # 상대의 weapon_bb가 내 get_bb와 충돌한 경우에만 여기로 옴
             weapon_bb = other.get_weapon_bb()
             if weapon_bb is None:
                 return
 
-            # 상성 체크: 상대가 점프공격 중이고 내가 슬라이딩 중이면 회피
             from sword import Jump as SwordJump
 
-            # 상대가 Sword의 점프공격 중인지 체크
             other_is_jump_attack = False
             if hasattr(other, 'state_machine'):
                 if isinstance(other.state_machine.cur_state, SwordJump):
-                    if other.get_weapon_bb() is not None:  # 점프공격 중
+                    if other.get_weapon_bb() is not None:
                         other_is_jump_attack = True
 
-            # 내가 슬라이딩 중인지 체크 (Punch의 Run상태에서 atk=True)
             my_is_sliding = False
             if isinstance(self.state_machine.cur_state, Run):
                 if self.state_machine.cur_state.atk:
                     my_is_sliding = True
 
-            # 상대 점프공격 vs 내 슬라이딩 = 회피 성공
             if other_is_jump_attack and my_is_sliding:
-                print(f'Player {self.player_id} dodged jump attack with sliding!')
                 return
 
-            # 쿨타임 체크
             current_time = game_framework.get_time()
             if current_time - self.last_hit_time >= self.hit_cooldown:
                 if self.hp > 0:
                     self.hp -= 1
                     self.last_hit_time = current_time
-                    print(f'Player {other.player_id} hit Player {self.player_id}! HP: {self.hp}')
 
         if group == 'player:tile':
             sword_left, sword_bottom, sword_right, sword_top = self.state_machine.cur_state.get_bb()
