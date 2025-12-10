@@ -1,5 +1,5 @@
 from pico2d import *
-import select_weapon as start_mode
+import select_weapon as start_mode 
 import game_framework
 
 
